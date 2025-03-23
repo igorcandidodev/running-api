@@ -25,13 +25,18 @@ public class StravaAuthentication {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public StravaAuthentication(String tokenType, Integer expiresAt, Integer expiresIn, String refreshToken, String accessToken, User user) {
+    @OneToOne
+    @JoinColumn(name = "athlete_id")
+    private Athlete athlete;
+
+    public StravaAuthentication(String tokenType, Integer expiresAt, Integer expiresIn, String refreshToken, String accessToken, User user, Athlete athlete) {
         this.tokenType = tokenType;
         this.expiresAt = expiresAt;
         this.expiresIn = expiresIn;
         this.refreshToken = refreshToken;
         this.accessToken = accessToken;
         this.user = user;
+        this.athlete = athlete;
     }
 
     public StravaAuthentication() {
@@ -84,5 +89,21 @@ public class StravaAuthentication {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Athlete getAthlete() {
+        return athlete;
+    }
+
+    public void setAthlete(Athlete athlete) {
+        this.athlete = athlete;
     }
 }
