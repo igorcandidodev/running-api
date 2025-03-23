@@ -1,5 +1,6 @@
 package com.runningapi.runningapi.model.strava;
 
+import com.runningapi.runningapi.model.User;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,25 +12,38 @@ public class StravaAuthentication {
     private Long id;
 
     private String tokenType;
-    private int expiresAt;
-    private int expiresIn;
+
+    private Integer expiresAt;
+
+    private Integer expiresIn;
+
     private String refreshToken;
+
     private String accessToken;
 
     @OneToOne
-    @JoinColumn(name = "athlete_id")
-    private Athlete athlete;
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public StravaAuthentication() {
-    }
-
-    public StravaAuthentication(String tokenType, int expiresAt, int expiresIn, String refreshToken, String accessToken, Athlete athlete) {
+    public StravaAuthentication(String tokenType, Integer expiresAt, Integer expiresIn, String refreshToken, String accessToken, User user) {
         this.tokenType = tokenType;
         this.expiresAt = expiresAt;
         this.expiresIn = expiresIn;
         this.refreshToken = refreshToken;
         this.accessToken = accessToken;
-        this.athlete = athlete;
+        this.user = user;
+    }
+
+    public StravaAuthentication() {
+
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTokenType() {
@@ -40,19 +54,19 @@ public class StravaAuthentication {
         this.tokenType = tokenType;
     }
 
-    public int getExpiresAt() {
+    public Integer getExpiresAt() {
         return expiresAt;
     }
 
-    public void setExpiresAt(int expiresAt) {
+    public void setExpiresAt(Integer expiresAt) {
         this.expiresAt = expiresAt;
     }
 
-    public int getExpiresIn() {
+    public Integer getExpiresIn() {
         return expiresIn;
     }
 
-    public void setExpiresIn(int expiresIn) {
+    public void setExpiresIn(Integer expiresIn) {
         this.expiresIn = expiresIn;
     }
 
@@ -70,21 +84,5 @@ public class StravaAuthentication {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
-    }
-
-    public Athlete getAthlete() {
-        return athlete;
-    }
-
-    public void setAthlete(Athlete athlete) {
-        this.athlete = athlete;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 }

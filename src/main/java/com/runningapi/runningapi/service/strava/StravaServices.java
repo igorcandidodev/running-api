@@ -2,7 +2,10 @@ package com.runningapi.runningapi.service.strava;
 
 import com.runningapi.runningapi.configuration.StravaConfig;
 import com.runningapi.runningapi.dto.strava.response.UserAuthenticationResponse;
+import com.runningapi.runningapi.mapper.StravaAuthenticationMapper;
+import com.runningapi.runningapi.model.strava.StravaAuthentication;
 import com.runningapi.runningapi.repository.StravaAuthenticationRepository;
+import com.runningapi.runningapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,13 +19,19 @@ public class StravaServices {
     @Autowired
     private StravaAuthenticationRepository authenticationRepositoy;
 
+    @Autowired
+    private StravaAuthenticationMapper stravaAuthenticationMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+
     private final WebClient webClient;
 
     public StravaServices(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.build();
     }
 
-    public String getRedirectUriAuthorization() {
+    public String getRedirectUriAuthorization(Long id) {
         return  stravaConfig.getAuthUri() +
                 "authorize?" +
                 "client_id=" +
@@ -33,10 +42,10 @@ public class StravaServices {
                 "&approval_prompt=force" +
                 "&scope=" +
                 stravaConfig.getScope() +
-                "&state=runningapi";
+                "&state=" + id;
     }
 
-    public UserAuthenticationResponse getAuthorizationCode(String code) {
+    public void processAuthorizationCode(String code, Long state) {
         var url = new StringBuilder();
         url.append(stravaConfig.getAuthUri())
                 .append("token")
@@ -51,9 +60,29 @@ public class StravaServices {
         var response = webClient.post()
                 .uri(url.toString())
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        clientResponse -> clientResponse.bodyToMono(String.class).map(body -> new RuntimeException("Erro ao se comunicar com a  API do Strava: " + body)))
                 .bodyToMono(UserAuthenticationResponse.class)
                 .block();
 
-        return response;
+        var stravaAuthentication = authenticationRepositoy.findByUserId(state);
+
+        if(stravaAuthentication == null) {
+            var user = userRepository.findById(state).orElseThrow(() -> new RuntimeException("User not found"));
+            stravaAuthentication = stravaAuthenticationMapper.toEntity(response, user);
+        } else {
+            assert response != null;
+            updateStravaAuthentication(response, stravaAuthentication);
+        }
+
+        authenticationRepositoy.save(stravaAuthentication);
+    }
+
+    public void updateStravaAuthentication(UserAuthenticationResponse newAuthentication, StravaAuthentication oldAuthentication) {
+        oldAuthentication.setAccessToken(newAuthentication.accessToken());
+        oldAuthentication.setExpiresAt(newAuthentication.expiresAt());
+        oldAuthentication.setExpiresIn(newAuthentication.expiresIn());
+        oldAuthentication.setRefreshToken(newAuthentication.refreshToken());
+        oldAuthentication.setTokenType(newAuthentication.tokenType());
     }
 }

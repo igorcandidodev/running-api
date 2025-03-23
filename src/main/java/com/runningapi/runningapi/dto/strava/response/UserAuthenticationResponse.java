@@ -7,10 +7,10 @@ public record UserAuthenticationResponse(
         String tokenType,
 
         @JsonProperty("expires_at")
-        int expiresAt,
+        Integer expiresAt,
 
         @JsonProperty("expires_in")
-        int expiresIn,
+        Integer expiresIn,
 
         @JsonProperty("refresh_token")
         String refreshToken,
