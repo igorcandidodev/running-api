@@ -13,14 +13,14 @@ public class StravaAuthController {
     @Autowired
     private StravaServices stravaServices;
 
-    @GetMapping("/")
-    public ResponseEntity<Void> authentication() {
-        return ResponseEntity.status(HttpStatus.FOUND).header("location", stravaServices.getRedirectUriAuthorization()).build();
+    @GetMapping("/{id}")
+    public ResponseEntity<Void> authentication(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.FOUND).header("location", stravaServices.getRedirectUriAuthorization(id)).build();
     }
 
     @GetMapping("/callback")
-    public ResponseEntity<Void> callback(@RequestParam String code, @RequestParam String state) {
-        stravaServices.getAuthorizationCode(code);
+    public ResponseEntity<Void> callback(@RequestParam String code, @RequestParam Long state) {
+        stravaServices.processAuthorizationCode(code, state);
 
         return ResponseEntity.status(HttpStatus.FOUND).header("location", "").build();
     }

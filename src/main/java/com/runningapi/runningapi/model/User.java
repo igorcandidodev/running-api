@@ -1,6 +1,7 @@
 package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.runningapi.runningapi.model.strava.StravaAuthentication;
 import jakarta.persistence.*;
 
 import java.io.Serial;
@@ -33,6 +34,9 @@ public class User implements Serializable {
     private List<PhysicalLimitation> physicalLimitation;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Objective> objectives;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private StravaAuthentication stravaAuthentication;
 
     public User() {
     }
@@ -119,5 +123,13 @@ public class User implements Serializable {
 
     public void setPhysicalLimitation(List<PhysicalLimitation> physicalLimitation) {
         this.physicalLimitation = physicalLimitation;
+    }
+
+    public StravaAuthentication getStravaAuthentication() {
+        return stravaAuthentication;
+    }
+
+    public void setStravaAuthentication(StravaAuthentication stravaAuthentication) {
+        this.stravaAuthentication = stravaAuthentication;
     }
 }
