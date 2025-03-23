@@ -4,6 +4,7 @@ import com.runningapi.runningapi.configuration.StravaConfig;
 import com.runningapi.runningapi.dto.strava.response.UserAuthenticationResponse;
 import com.runningapi.runningapi.mapper.StravaAuthenticationMapper;
 import com.runningapi.runningapi.model.strava.StravaAuthentication;
+import com.runningapi.runningapi.repository.AthleteRepository;
 import com.runningapi.runningapi.repository.StravaAuthenticationRepository;
 import com.runningapi.runningapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class StravaServices {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AthleteRepository athleteRepository;
 
     private final WebClient webClient;
 
@@ -76,6 +80,7 @@ public class StravaServices {
             }
         }
 
+        athleteRepository.save(stravaAuthentication.getAthlete());
         authenticationRepositoy.save(stravaAuthentication);
     }
 
