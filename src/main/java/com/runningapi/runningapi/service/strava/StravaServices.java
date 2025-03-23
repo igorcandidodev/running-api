@@ -71,14 +71,42 @@ public class StravaServices {
             var user = userRepository.findById(state).orElseThrow(() -> new RuntimeException("User not found"));
             stravaAuthentication = stravaAuthenticationMapper.toEntity(response, user);
         } else {
-            assert response != null;
-            updateStravaAuthentication(response, stravaAuthentication);
+            if(response != null) {
+                updateStravaAuthentication(response, stravaAuthentication);
+            }
         }
 
         authenticationRepositoy.save(stravaAuthentication);
     }
 
-    public void updateStravaAuthentication(UserAuthenticationResponse newAuthentication, StravaAuthentication oldAuthentication) {
+    public void refreshAccessToken(StravaAuthentication stravaAuthentication) {
+        var url = new StringBuilder();
+        url.append(stravaConfig.getAuthUri())
+                .append("token")
+                .append("?client_id=")
+                .append(stravaConfig.getClientId())
+                .append("&client_secret=")
+                .append(stravaConfig.getClientSecret())
+                .append("&grant_type=refresh_token")
+                .append("&refresh_token=")
+                .append(stravaAuthentication.getRefreshToken());
+
+        var response = webClient.post()
+                .uri(url.toString())
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        clientResponse -> clientResponse.bodyToMono(String.class).map(body -> new RuntimeException("Erro ao se comunicar com a  API do Strava: " + body)))
+                .bodyToMono(UserAuthenticationResponse.class)
+                .block();
+
+        if(response != null) {
+            updateStravaAuthentication(response, stravaAuthentication);
+            authenticationRepositoy.save(stravaAuthentication);
+        }
+
+    }
+
+    private void updateStravaAuthentication(UserAuthenticationResponse newAuthentication, StravaAuthentication oldAuthentication) {
         oldAuthentication.setAccessToken(newAuthentication.accessToken());
         oldAuthentication.setExpiresAt(newAuthentication.expiresAt());
         oldAuthentication.setExpiresIn(newAuthentication.expiresIn());

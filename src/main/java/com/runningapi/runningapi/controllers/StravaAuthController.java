@@ -13,9 +13,9 @@ public class StravaAuthController {
     @Autowired
     private StravaServices stravaServices;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Void> authentication(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.FOUND).header("location", stravaServices.getRedirectUriAuthorization(id)).build();
+    @GetMapping("/{idUsuario}")
+    public ResponseEntity<Void> authentication(@PathVariable Long idUsuario) {
+        return ResponseEntity.status(HttpStatus.FOUND).header("location", stravaServices.getRedirectUriAuthorization(idUsuario)).build();
     }
 
     @GetMapping("/callback")
