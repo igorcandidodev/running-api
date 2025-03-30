@@ -19,11 +19,9 @@ public class User implements Serializable {
     private Long id;
     @Column(nullable = false)
     private String fullName;
-    @Column(nullable = false)
     private LocalDate birthDate;
     @Column(nullable = false, unique = true)
     private String email;
-    @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -52,6 +50,11 @@ public class User implements Serializable {
         this.runningHistory = runningHistory;
         this.physicalActivityHistory = physicalActivityHistory;
         this.physicalLimitation = physicalLimitation;
+    }
+
+    public User(String fullName, String email) {
+        this.fullName = fullName;
+        this.email = email;
     }
 
     public Long getId() {
