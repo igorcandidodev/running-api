@@ -1,15 +1,20 @@
 package com.runningapi.runningapi.service.strava;
 
 import com.runningapi.runningapi.configuration.StravaConfig;
+import com.runningapi.runningapi.dto.strava.request.WebhookEvent;
 import com.runningapi.runningapi.dto.strava.response.UserAuthenticationResponse;
+import com.runningapi.runningapi.dto.strava.response.activity.StravaActivityResponse;
 import com.runningapi.runningapi.mapper.StravaAuthenticationMapper;
 import com.runningapi.runningapi.model.strava.StravaAuthentication;
 import com.runningapi.runningapi.repository.AthleteRepository;
 import com.runningapi.runningapi.repository.StravaAuthenticationRepository;
 import com.runningapi.runningapi.repository.UserRepository;
+import com.runningapi.runningapi.utils.DataConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.time.ZonedDateTime;
 
 @Service
 public class StravaServices {
@@ -84,7 +89,7 @@ public class StravaServices {
         authenticationRepositoy.save(stravaAuthentication);
     }
 
-    public void refreshAccessToken(StravaAuthentication stravaAuthentication) {
+    public StravaAuthentication refreshAccessToken(StravaAuthentication stravaAuthentication) {
         var url = new StringBuilder();
         url.append(stravaConfig.getAuthUri())
                 .append("token")
@@ -104,11 +109,11 @@ public class StravaServices {
                 .bodyToMono(UserAuthenticationResponse.class)
                 .block();
 
-        if(response != null) {
-            updateStravaAuthentication(response, stravaAuthentication);
-            authenticationRepositoy.save(stravaAuthentication);
+        if (response == null) {
+           throw new RuntimeException("Erro ao obter o token de acesso do Strava");
         }
-
+        updateStravaAuthentication(response, stravaAuthentication);
+        return authenticationRepositoy.save(stravaAuthentication);
     }
 
     private void updateStravaAuthentication(UserAuthenticationResponse newAuthentication, StravaAuthentication oldAuthentication) {
@@ -117,5 +122,44 @@ public class StravaServices {
         oldAuthentication.setExpiresIn(newAuthentication.expiresIn());
         oldAuthentication.setRefreshToken(newAuthentication.refreshToken());
         oldAuthentication.setTokenType(newAuthentication.tokenType());
+    }
+
+    public String getVerifyTokenCallback() {
+        return stravaConfig.getVerifyTokenCallback();
+    }
+
+    public void processWebhookActivityCreated(WebhookEvent event) {
+
+        var athlete = athleteRepository.findById(event.ownerId()).orElseThrow(() -> new RuntimeException("Athlete not found"));
+
+        returnActivityByStrava(event, athlete.getAuthentication());
+    }
+
+    public void returnActivityByStrava(WebhookEvent event, StravaAuthentication stravaAuthentication) {
+
+        if(stravaAuthentication == null) {
+            // não é possível obter a atividade realizada no Strava
+        }
+
+        var tokenExpires = DataConverter.convertToZonedDateTime(stravaAuthentication.getExpiresAt());
+
+        if(tokenExpires.isBefore(ZonedDateTime.now())) {
+            stravaAuthentication = refreshAccessToken(stravaAuthentication);
+        }
+
+        var url = new StringBuilder();
+        url.append(stravaConfig.getApiUri())
+                .append("activities/")
+                .append(event.objectId());
+
+        var response = webClient.get()
+                .uri(url.toString())
+                .header("Authorization", "Bearer " + stravaAuthentication.getAccessToken())
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        clientResponse -> clientResponse.bodyToMono(String.class).map(body -> new RuntimeException("Erro ao se comunicar com a  API do Strava: " + body)))
+                .bodyToMono(StravaActivityResponse.class)
+                .block();
+
     }
 }
