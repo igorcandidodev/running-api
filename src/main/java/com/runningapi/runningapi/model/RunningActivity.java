@@ -39,6 +39,10 @@ public class RunningActivity implements Serializable {
         this.user = user;
     }
 
+    public RunningActivity() {
+
+    }
+
     public Long getId() {
         return id;
     }

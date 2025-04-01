@@ -20,8 +20,11 @@ public class StravaController {
     @Autowired
     private QueueSender queueSender;
 
-    @Value("${queue.activity.update.strava}")
-    private String stravaActivityQueue;
+    @Value("${exchange.activity.update.strava}")
+    private String exchangeActivityStrava;
+
+    @Value("${key.activity.update.strava}")
+    private String keyActivityStrava;
 
     @GetMapping("/athlete-activity/webhook")
     public ResponseEntity<CallbackResponse> validationWebhook(@RequestParam("hub.mode") String hubMode,
@@ -38,7 +41,7 @@ public class StravaController {
     public ResponseEntity<Void> eventActivity(@RequestBody WebhookEvent body) {
 
         if(body != null && body.aspectType().equals("create")) {
-            queueSender.sendMessage(stravaActivityQueue, body);
+            queueSender.sendMessage(exchangeActivityStrava, keyActivityStrava, body);
         } else {
             System.out.println("Received non-create event: " + body);
         }

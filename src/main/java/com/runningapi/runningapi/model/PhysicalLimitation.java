@@ -26,6 +26,10 @@ public class PhysicalLimitation implements Serializable {
         this.user = user;
     }
 
+    public PhysicalLimitation() {
+
+    }
+
     public String getDescription() {
         return description;
     }

@@ -27,10 +27,13 @@ public class User implements Serializable {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<RunningActivity> runningHistory;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PhysicalActivity> physicalActivityHistory;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PhysicalLimitation> physicalLimitation;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Objective> objectives;
 

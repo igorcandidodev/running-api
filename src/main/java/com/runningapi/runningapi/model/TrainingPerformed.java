@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Entity(name = "TRAININGS_PERFORMEDS")
 public class TrainingPerformed implements Serializable {
@@ -12,28 +13,37 @@ public class TrainingPerformed implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private String title;
+
     private String description;
+
     @Column(nullable = false)
-    private LocalDate date;
-    @Column(nullable = false)
-    private DayOfWeek dayOfWeekName;
+    private ZonedDateTime date;
+
+    private Double distance;
+
+    private Double movingTime;
+
+    private Double elapsedTime;
+
+    private Double totalElevationGain;
+
+    private Double averageSpeed;
+
+    private Double calories;
+
     @OneToOne
     @JoinColumn(name = "training_id")
     private Training training;
+
     @ManyToOne
     @JoinColumn(name = "objective_id", nullable = false)
     private Objective objective;
 
-    public TrainingPerformed(Long id, String title, String description, LocalDate date, DayOfWeek dayOfWeekName, Training training, Objective objective) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.date = date;
-        this.dayOfWeekName = dayOfWeekName;
-        this.training = training;
-        this.objective = objective;
+    public TrainingPerformed() {
+
     }
 
     public Long getId() {
@@ -60,20 +70,12 @@ public class TrainingPerformed implements Serializable {
         this.description = description;
     }
 
-    public LocalDate getDate() {
+    public ZonedDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(ZonedDateTime date) {
         this.date = date;
-    }
-
-    public DayOfWeek getDayOfWeekName() {
-        return dayOfWeekName;
-    }
-
-    public void setDayOfWeekName(DayOfWeek dayOfWeekName) {
-        this.dayOfWeekName = dayOfWeekName;
     }
 
     public Training getTraining() {
@@ -90,5 +92,53 @@ public class TrainingPerformed implements Serializable {
 
     public void setObjective(Objective objective) {
         this.objective = objective;
+    }
+
+    public Double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
+
+    public Double getMovingTime() {
+        return movingTime;
+    }
+
+    public void setMovingTime(Double movingTime) {
+        this.movingTime = movingTime;
+    }
+
+    public Double getElapsedTime() {
+        return elapsedTime;
+    }
+
+    public void setElapsedTime(Double elapsedTime) {
+        this.elapsedTime = elapsedTime;
+    }
+
+    public Double getTotalElevationGain() {
+        return totalElevationGain;
+    }
+
+    public void setTotalElevationGain(Double totalElevationGain) {
+        this.totalElevationGain = totalElevationGain;
+    }
+
+    public Double getAverageSpeed() {
+        return averageSpeed;
+    }
+
+    public void setAverageSpeed(Double averageSpeed) {
+        this.averageSpeed = averageSpeed;
+    }
+
+    public Double getCalories() {
+        return calories;
+    }
+
+    public void setCalories(Double calories) {
+        this.calories = calories;
     }
 }

@@ -43,6 +43,10 @@ public class Training implements Serializable {
         this.objective = objective;
     }
 
+    public Training() {
+
+    }
+
     public Long getId() {
         return id;
     }
@@ -97,5 +101,13 @@ public class Training implements Serializable {
 
     public void setObjective(Objective objective) {
         this.objective = objective;
+    }
+
+    public TrainingPerformed getTrainingPerformed() {
+        return trainingPerformed;
+    }
+
+    public void setTrainingPerformed(TrainingPerformed trainingPerformed) {
+        this.trainingPerformed = trainingPerformed;
     }
 }

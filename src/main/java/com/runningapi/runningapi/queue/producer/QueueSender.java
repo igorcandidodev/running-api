@@ -10,7 +10,7 @@ public class QueueSender {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    public void sendMessage(String queueName, Object message) {
-        rabbitTemplate.convertAndSend(queueName, message);
+    public void sendMessage(String exchangeName, String routingKey, Object message) {
+        rabbitTemplate.convertAndSend(exchangeName, routingKey, message);
     }
 }

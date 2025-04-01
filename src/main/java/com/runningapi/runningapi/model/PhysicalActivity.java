@@ -31,6 +31,10 @@ public class PhysicalActivity implements Serializable {
         this.user = user;
     }
 
+    public PhysicalActivity() {
+
+    }
+
     public Long getId() {
         return id;
     }

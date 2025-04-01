@@ -12,4 +12,11 @@ public class DataConverter {
         }
         return ZonedDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneId.systemDefault());
     }
+
+    public static String convertToString(ZonedDateTime zonedDateTime, String format) {
+        if (zonedDateTime == null) {
+            return null;
+        }
+        return zonedDateTime.format(java.time.format.DateTimeFormatter.ofPattern(format));
+    }
 }

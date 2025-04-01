@@ -48,6 +48,10 @@ public class Objective implements Serializable {
         this.availableTrainingDays = availableTrainingDays;
     }
 
+    public Objective() {
+
+    }
+
     public Long getId() {
         return id;
     }

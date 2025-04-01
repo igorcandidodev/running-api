@@ -9,6 +9,7 @@ import com.runningapi.runningapi.model.strava.StravaAuthentication;
 import com.runningapi.runningapi.repository.AthleteRepository;
 import com.runningapi.runningapi.repository.StravaAuthenticationRepository;
 import com.runningapi.runningapi.repository.UserRepository;
+import com.runningapi.runningapi.service.TrainingService;
 import com.runningapi.runningapi.utils.DataConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,9 @@ public class StravaServices {
 
     @Autowired
     private AthleteRepository athleteRepository;
+
+    @Autowired
+    private TrainingService trainingService;
 
     private final WebClient webClient;
 
@@ -132,12 +136,20 @@ public class StravaServices {
 
         var athlete = athleteRepository.findById(event.ownerId()).orElseThrow(() -> new RuntimeException("Athlete not found"));
 
-        returnActivityByStrava(event, athlete.getAuthentication());
+        var activityAtStrava = getActivityAtStrava(event, athlete.getAuthentication());
+
+        if(activityAtStrava != null) {
+            trainingService.linkTrainingWithTrainingPerformed(activityAtStrava,
+                                                              athlete.getAuthentication().getUser().getId());
+        } else {
+            throw new RuntimeException("Erro ao obter a atividade realizada no Strava");
+        }
     }
 
-    public void returnActivityByStrava(WebhookEvent event, StravaAuthentication stravaAuthentication) {
+    public StravaActivityResponse getActivityAtStrava(WebhookEvent event, StravaAuthentication stravaAuthentication) {
 
         if(stravaAuthentication == null) {
+            throw new RuntimeException("Erro ao obter o token de acesso do Strava");
             // não é possível obter a atividade realizada no Strava
         }
 
@@ -152,7 +164,7 @@ public class StravaServices {
                 .append("activities/")
                 .append(event.objectId());
 
-        var response = webClient.get()
+        return webClient.get()
                 .uri(url.toString())
                 .header("Authorization", "Bearer " + stravaAuthentication.getAccessToken())
                 .retrieve()
@@ -160,6 +172,5 @@ public class StravaServices {
                         clientResponse -> clientResponse.bodyToMono(String.class).map(body -> new RuntimeException("Erro ao se comunicar com a  API do Strava: " + body)))
                 .bodyToMono(StravaActivityResponse.class)
                 .block();
-
     }
 }
