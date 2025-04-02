@@ -1,6 +1,7 @@
 package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.runningapi.runningapi.enums.StatusActivity;
 import jakarta.persistence.*;
 
 import java.io.Serial;
@@ -13,21 +14,32 @@ public class Training implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private String title;
+
     @Column(nullable = false)
     private String description;
+
     @Column(nullable = false)
     private String weeklyGoal;
+
     @Column(nullable = false)
     private LocalDate date;
+
     @Column(nullable = false)
     private DayOfWeek dayOfWeekName;
+
+    @Column(nullable = false)
+    private StatusActivity statusActivity = StatusActivity.PENDING;
+
     @OneToOne(mappedBy = "training", cascade = CascadeType.ALL)
     private TrainingPerformed trainingPerformed;
+
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "objective_id")
@@ -109,5 +121,13 @@ public class Training implements Serializable {
 
     public void setTrainingPerformed(TrainingPerformed trainingPerformed) {
         this.trainingPerformed = trainingPerformed;
+    }
+
+    public StatusActivity getStatusActivity() {
+        return statusActivity;
+    }
+
+    public void setStatusActivity(StatusActivity statusActivity) {
+        this.statusActivity = statusActivity;
     }
 }

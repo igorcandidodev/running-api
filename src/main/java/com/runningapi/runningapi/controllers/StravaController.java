@@ -28,8 +28,8 @@ public class StravaController {
 
     @GetMapping("/athlete-activity/webhook")
     public ResponseEntity<CallbackResponse> validationWebhook(@RequestParam("hub.mode") String hubMode,
-                                                               @RequestParam("hub.challenge") String hubChallenge,
-                                                               @RequestParam("hub.verify_token") String hubVerifyToken) {
+                                                              @RequestParam("hub.challenge") String hubChallenge,
+                                                              @RequestParam("hub.verify_token") String hubVerifyToken) {
         if (hubMode.equals("subscribe") && hubVerifyToken.equals(stravaServices.getVerifyTokenCallback())) {
             return ResponseEntity.ok().body(new CallbackResponse(hubChallenge));
         } else {
@@ -40,12 +40,25 @@ public class StravaController {
     @PostMapping("/athlete-activity/webhook")
     public ResponseEntity<Void> eventActivity(@RequestBody WebhookEvent body) {
 
-        if(body != null && body.aspectType().equals("create")) {
-            queueSender.sendMessage(exchangeActivityStrava, keyActivityStrava, body);
-        } else {
-            System.out.println("Received non-create event: " + body);
+        if (body != null) {
+            switch (body.aspectType()) {
+                case "create" -> {
+                    System.out.println("Received create event: " + body);
+                    queueSender.sendMessage(exchangeActivityStrava, keyActivityStrava, body);
+                }
+                case "update" -> {
+                    System.out.println("Received update event: " + body);
+                }
+                case "delete" -> {
+                    System.out.println("Received delete event: " + body);
+                }
+                default -> {
+                    System.out.println("Unknown event type: " + body.aspectType());
+                }
+            }
         }
-        System.out.println("Received webhook data: " + body);
+
         return ResponseEntity.ok().build();
     }
+
 }

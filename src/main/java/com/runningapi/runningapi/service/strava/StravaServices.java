@@ -4,6 +4,8 @@ import com.runningapi.runningapi.configuration.StravaConfig;
 import com.runningapi.runningapi.dto.strava.request.WebhookEvent;
 import com.runningapi.runningapi.dto.strava.response.UserAuthenticationResponse;
 import com.runningapi.runningapi.dto.strava.response.activity.StravaActivityResponse;
+import com.runningapi.runningapi.exceptions.StravaAthleteNotFoundAsyncException;
+import com.runningapi.runningapi.exceptions.StravaAuthenticationAsyncException;
 import com.runningapi.runningapi.mapper.StravaAuthenticationMapper;
 import com.runningapi.runningapi.model.strava.StravaAuthentication;
 import com.runningapi.runningapi.repository.AthleteRepository;
@@ -134,29 +136,36 @@ public class StravaServices {
 
     public void processWebhookActivityCreated(WebhookEvent event) {
 
-        var athlete = athleteRepository.findById(event.ownerId()).orElseThrow(() -> new RuntimeException("Athlete not found"));
+        var athlete = athleteRepository.findById(event.ownerId()).orElseThrow(() -> new StravaAthleteNotFoundAsyncException("Athlete Strava not found by owner Id: " + event.ownerId() + ", received in webhook event by Strava"));
 
         var activityAtStrava = getActivityAtStrava(event, athlete.getAuthentication());
 
-        if(activityAtStrava != null) {
-            trainingService.linkTrainingWithTrainingPerformed(activityAtStrava,
-                                                              athlete.getAuthentication().getUser().getId());
-        } else {
-            throw new RuntimeException("Erro ao obter a atividade realizada no Strava");
+        if(activityAtStrava == null) {
+            throw new StravaAthleteNotFoundAsyncException("Activity Strava not found by activity Id: " + event.objectId() + ", received in webhook event by Strava");
         }
+
+        trainingService.linkTrainingWithTrainingPerformed(activityAtStrava,
+                athlete.getAuthentication().getUser().getId());
     }
 
     public StravaActivityResponse getActivityAtStrava(WebhookEvent event, StravaAuthentication stravaAuthentication) {
 
         if(stravaAuthentication == null) {
-            throw new RuntimeException("Erro ao obter o token de acesso do Strava");
-            // não é possível obter a atividade realizada no Strava
+            throw new StravaAuthenticationAsyncException("User Authentication Strava not found don't being possible to get activity");
         }
 
         var tokenExpires = DataConverter.convertToZonedDateTime(stravaAuthentication.getExpiresAt());
 
-        if(tokenExpires.isBefore(ZonedDateTime.now())) {
+        int countRetry = 0;
+
+        while (tokenExpires.isBefore(ZonedDateTime.now()) && countRetry < 3) {
             stravaAuthentication = refreshAccessToken(stravaAuthentication);
+            tokenExpires = DataConverter.convertToZonedDateTime(stravaAuthentication.getExpiresAt());
+            countRetry++;
+        }
+
+        if (countRetry >= 3) {
+            throw new StravaAuthenticationAsyncException("User Authentication Strava not found don't being possible to get activity");
         }
 
         var url = new StringBuilder();
@@ -169,7 +178,7 @@ public class StravaServices {
                 .header("Authorization", "Bearer " + stravaAuthentication.getAccessToken())
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                        clientResponse -> clientResponse.bodyToMono(String.class).map(body -> new RuntimeException("Erro ao se comunicar com a  API do Strava: " + body)))
+                        clientResponse -> clientResponse.bodyToMono(String.class).map(body -> new StravaAuthenticationAsyncException("Exception while trying communicate with Strava API to get Activity" + body)))
                 .bodyToMono(StravaActivityResponse.class)
                 .block();
     }

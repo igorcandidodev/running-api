@@ -1,6 +1,7 @@
 package com.runningapi.runningapi.service;
 
 import com.runningapi.runningapi.dto.strava.response.activity.StravaActivityResponse;
+import com.runningapi.runningapi.enums.StatusActivity;
 import com.runningapi.runningapi.model.Training;
 import com.runningapi.runningapi.model.TrainingPerformed;
 import com.runningapi.runningapi.repository.TrainingPerformedRepository;
@@ -48,11 +49,10 @@ public class TrainingService {
             trainingPerformedRepository.save(trainingPerformed);
 
             trainingTarget.setTrainingPerformed(trainingPerformed);
+            trainingTarget.setStatusActivity(StatusActivity.COMPLETED);
 
             saveTraining(trainingTarget);
 
-        } else {
-            throw new RuntimeException("Training not found");
         }
     }
 }
