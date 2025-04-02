@@ -21,6 +21,12 @@ public class StravaConfig {
     @Value("${strava.client.auth_uri}")
     private String authUri;
 
+    @Value("${strava.client.verify_token_callback}")
+    private String verifyTokenCallback;
+
+    @Value("${strava.client.api_uri}")
+    private String apiUri;
+
     public String getClientId() {
         return clientId;
     }
@@ -41,4 +47,11 @@ public class StravaConfig {
         return authUri;
     }
 
+    public String getVerifyTokenCallback() {
+        return verifyTokenCallback;
+    }
+
+    public String getApiUri() {
+        return apiUri;
+    }
 }

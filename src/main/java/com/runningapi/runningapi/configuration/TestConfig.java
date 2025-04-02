@@ -16,12 +16,12 @@ public class TestConfig implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        var user = new User();
-        user.setEmail("runai@gmail.com");
-        user.setFullName("Run AI");
-        user.setPassword("123456");
-        user.setBirthDate(LocalDate.of(2000, 1, 1));
-
-        userRepository.save(user);
+//        var user = new User();
+//        user.setEmail("runai@gmail.com");
+//        user.setFullName("Run AI");
+//        user.setPassword("123456");
+//        user.setBirthDate(LocalDate.of(2000, 1, 1));
+//
+//        userRepository.save(user);
     }
 }
