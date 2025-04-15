@@ -4,6 +4,7 @@ import com.runningapi.runningapi.configuration.StravaConfig;
 import com.runningapi.runningapi.dto.strava.request.WebhookEvent;
 import com.runningapi.runningapi.dto.strava.response.UserAuthenticationResponse;
 import com.runningapi.runningapi.dto.strava.response.activity.StravaActivityResponse;
+import com.runningapi.runningapi.enums.StatusActivity;
 import com.runningapi.runningapi.exceptions.StravaAthleteNotFoundAsyncException;
 import com.runningapi.runningapi.exceptions.StravaAuthenticationAsyncException;
 import com.runningapi.runningapi.mapper.StravaAuthenticationMapper;
@@ -11,6 +12,7 @@ import com.runningapi.runningapi.model.strava.StravaAuthentication;
 import com.runningapi.runningapi.repository.AthleteRepository;
 import com.runningapi.runningapi.repository.StravaAuthenticationRepository;
 import com.runningapi.runningapi.repository.UserRepository;
+import com.runningapi.runningapi.service.TrainingPerformedService;
 import com.runningapi.runningapi.service.TrainingService;
 import com.runningapi.runningapi.utils.DataConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,9 @@ public class StravaServices {
 
     @Autowired
     private TrainingService trainingService;
+
+    @Autowired
+    private TrainingPerformedService trainingPerformedService;
 
     private final WebClient webClient;
 
@@ -144,8 +149,35 @@ public class StravaServices {
             throw new StravaAthleteNotFoundAsyncException("Activity Strava not found by activity Id: " + event.objectId() + ", received in webhook event by Strava");
         }
 
+        if(!activityAtStrava.type().equals("Run")) {
+            throw new StravaAthleteNotFoundAsyncException("Activity Strava not is a Run by activity Id: " + event.objectId() + ", received in webhook event by Strava");
+        }
+
         trainingService.linkTrainingWithTrainingPerformed(activityAtStrava,
                 athlete.getAuthentication().getUser().getId());
+    }
+
+    public void processWebhookActivityUpdated(WebhookEvent event) {
+
+        if(event.updates().title() != null) {
+            var training = trainingPerformedService.findTrainingPerformedByStravaId(event.objectId());
+
+            if(training != null) {
+                training.setTitle(event.updates().title());
+                trainingPerformedService.saveTraining(training);
+            }
+        }
+
+    }
+
+    public void processWebhookActivityDeleted(WebhookEvent event) {
+        var training = trainingService.findTrainingByStravaId(event.objectId());
+        if(training != null) {
+            training.setStatusActivity(StatusActivity.PENDING);
+            training.setTrainingPerformed(null);
+
+            trainingService.saveTraining(training);
+        }
     }
 
     public StravaActivityResponse getActivityAtStrava(WebhookEvent event, StravaAuthentication stravaAuthentication) {

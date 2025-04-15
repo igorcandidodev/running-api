@@ -23,8 +23,14 @@ public class StravaController {
     @Value("${exchange.activity.update.strava}")
     private String exchangeActivityStrava;
 
-    @Value("${key.activity.update.strava}")
-    private String keyActivityStrava;
+    @Value("${key.activity.updated.strava}")
+    private String keyActivityUpdatedStrava;
+
+    @Value("${key.activity.created.strava}")
+    private String keyActivityCreatedStrava;
+
+    @Value("${key.activity.deleted.strava}")
+    private String keyActivityDeletedStrava;
 
     @GetMapping("/athlete-activity/webhook")
     public ResponseEntity<CallbackResponse> validationWebhook(@RequestParam("hub.mode") String hubMode,
@@ -42,19 +48,10 @@ public class StravaController {
 
         if (body != null) {
             switch (body.aspectType()) {
-                case "create" -> {
-                    System.out.println("Received create event: " + body);
-                    queueSender.sendMessage(exchangeActivityStrava, keyActivityStrava, body);
-                }
-                case "update" -> {
-                    System.out.println("Received update event: " + body);
-                }
-                case "delete" -> {
-                    System.out.println("Received delete event: " + body);
-                }
-                default -> {
-                    System.out.println("Unknown event type: " + body.aspectType());
-                }
+                case "create" -> queueSender.sendMessage(exchangeActivityStrava, keyActivityCreatedStrava, body);
+                case "update" -> queueSender.sendMessage(exchangeActivityStrava, keyActivityUpdatedStrava, body);
+                case "delete" -> queueSender.sendMessage(exchangeActivityStrava, keyActivityDeletedStrava, body);
+                default -> System.out.println("Unknown event type: " + body.aspectType());
             }
         }
 

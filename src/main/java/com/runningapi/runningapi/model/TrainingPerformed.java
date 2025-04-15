@@ -17,6 +17,8 @@ public class TrainingPerformed implements Serializable {
     @Column(nullable = false)
     private String title;
 
+    private Long idStrava;
+
     private String description;
 
     @Column(nullable = false)
@@ -140,5 +142,13 @@ public class TrainingPerformed implements Serializable {
 
     public void setCalories(Double calories) {
         this.calories = calories;
+    }
+
+    public Long getIdStrava() {
+        return idStrava;
+    }
+
+    public void setIdStrava(Long idStrava) {
+        this.idStrava = idStrava;
     }
 }

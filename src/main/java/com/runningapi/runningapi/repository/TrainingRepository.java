@@ -17,4 +17,9 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
             "AND t.objective.user.id = ?2 " +
             "ORDER BY t.date DESC")
     Optional<Training> findByDateAndUserId(String date, Long userId);
+
+    @Query("SELECT t FROM TRAININGS t " +
+            "           JOIN t.trainingPerformed " +
+            "WHERE t.trainingPerformed.idStrava = ?1")
+    Optional<Training> findByIdStrava(Long idStrava);
 }
