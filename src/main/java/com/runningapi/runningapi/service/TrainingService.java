@@ -45,6 +45,7 @@ public class TrainingService {
             trainingPerformed.setDistance(training.distance());
             trainingPerformed.setTraining(trainingTarget);
             trainingPerformed.setObjective(trainingTarget.getObjective());
+            trainingPerformed.setIdStrava(training.id());
 
             trainingPerformedRepository.save(trainingPerformed);
 
@@ -54,5 +55,10 @@ public class TrainingService {
             saveTraining(trainingTarget);
 
         }
+    }
+
+    public Training findTrainingByStravaId(Long stravaId) {
+        return trainingRepository.findByIdStrava(stravaId)
+                .orElseThrow(() -> new RuntimeException("Training performed not found"));
     }
 }
