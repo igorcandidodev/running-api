@@ -14,14 +14,16 @@ public class PhysicalLimitation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
+    private boolean feltPain;
     private String description;
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
 
-    public PhysicalLimitation(Long id, String description, User user) {
-        this.id = id;
+    public PhysicalLimitation(boolean feltPain, String description, User user) {
+        this.feltPain = feltPain;
         this.description = description;
         this.user = user;
     }
@@ -52,5 +54,13 @@ public class PhysicalLimitation implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public boolean isFeltPain() {
+        return feltPain;
+    }
+
+    public void setFeltPain(boolean feltPain) {
+        this.feltPain = feltPain;
     }
 }

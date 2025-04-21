@@ -1,11 +1,13 @@
 package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.runningapi.runningapi.enums.Intensity;
 import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
+import java.time.LocalDate;
 
 @Entity(name = "RUNNING_ACTIVITIES")
 public class RunningActivity implements Serializable {
@@ -19,9 +21,11 @@ public class RunningActivity implements Serializable {
     private double distanceCovered;
     @Column(nullable = false)
     private Duration timeSpent;
-    private String observation;
+    private LocalDate date;
     @Column(nullable = false)
-    private boolean feltPain;
+    private Intensity intensity;
+    @Column(nullable = false)
+    private boolean feltTired;
     @Column(nullable = false)
     private boolean isBestResult;
     @ManyToOne
@@ -29,12 +33,12 @@ public class RunningActivity implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public RunningActivity(Long id, double distanceCovered, Duration timeSpent, String observation, boolean feltPain, boolean isBestResult, User user) {
-        this.id = id;
+    public RunningActivity(double distanceCovered, Duration timeSpent, LocalDate date, Intensity intensity, boolean feltTired, boolean isBestResult, User user) {
         this.distanceCovered = distanceCovered;
         this.timeSpent = timeSpent;
-        this.observation = observation;
-        this.feltPain = feltPain;
+        this.date = date;
+        this.intensity = intensity;
+        this.feltTired = feltTired;
         this.isBestResult = isBestResult;
         this.user = user;
     }
@@ -67,20 +71,28 @@ public class RunningActivity implements Serializable {
         this.timeSpent = timeSpent;
     }
 
-    public String getObservation() {
-        return observation;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setObservation(String observation) {
-        this.observation = observation;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
-    public boolean isFeltPain() {
-        return feltPain;
+    public Intensity getIntensity() {
+        return intensity;
     }
 
-    public void setFeltPain(boolean feltPain) {
-        this.feltPain = feltPain;
+    public void setIntensity(Intensity intensity) {
+        this.intensity = intensity;
+    }
+
+    public boolean isFeltTired() {
+        return feltTired;
+    }
+
+    public void setFeltTired(boolean feltTired) {
+        this.feltTired = feltTired;
     }
 
     public boolean isBestResult() {
