@@ -17,13 +17,19 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private String fullName;
+
     private LocalDate birthDate;
+
     @Column(nullable = false, unique = true)
     private String email;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
+    private String provider;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<RunningActivity> runningHistory;
@@ -138,5 +144,13 @@ public class User implements Serializable {
 
     public void setStravaAuthentication(StravaAuthentication stravaAuthentication) {
         this.stravaAuthentication = stravaAuthentication;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 }
