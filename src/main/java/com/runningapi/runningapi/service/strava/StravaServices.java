@@ -14,7 +14,7 @@ import com.runningapi.runningapi.repository.StravaAuthenticationRepository;
 import com.runningapi.runningapi.repository.UserRepository;
 import com.runningapi.runningapi.service.TrainingPerformedService;
 import com.runningapi.runningapi.service.TrainingService;
-import com.runningapi.runningapi.utils.DataConverter;
+import com.runningapi.runningapi.utils.DateConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -186,13 +186,13 @@ public class StravaServices {
             throw new StravaAuthenticationAsyncException("User Authentication Strava not found don't being possible to get activity");
         }
 
-        var tokenExpires = DataConverter.convertToZonedDateTime(stravaAuthentication.getExpiresAt());
+        var tokenExpires = DateConverter.convertToZonedDateTime(stravaAuthentication.getExpiresAt());
 
         int countRetry = 0;
 
         while (tokenExpires.isBefore(ZonedDateTime.now()) && countRetry < 3) {
             stravaAuthentication = refreshAccessToken(stravaAuthentication);
-            tokenExpires = DataConverter.convertToZonedDateTime(stravaAuthentication.getExpiresAt());
+            tokenExpires = DateConverter.convertToZonedDateTime(stravaAuthentication.getExpiresAt());
             countRetry++;
         }
 

@@ -1,13 +1,13 @@
 package com.runningapi.runningapi.enums;
 
-public enum Frequency {
-    ALWAYS("Sempre"),
-    SOMETIMES("Às vezes"),
-    RARELY("Raramente");
+public enum Intensity {
+    FRACO("Fraco"),
+    MODERADO("Moderado"),
+    FORTE("Forte");
 
     private final String value;
 
-    Frequency(String value) {
+    Intensity(String value) {
         this.value = value;
     }
 
