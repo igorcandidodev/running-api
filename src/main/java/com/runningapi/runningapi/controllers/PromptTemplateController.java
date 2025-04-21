@@ -52,7 +52,7 @@ public class PromptTemplateController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete Prompt Template by ID")
-    public ResponseEntity<PromptTemplate> deltePromptTemplate(@PathVariable Long id) {
+    public ResponseEntity<PromptTemplate> deletePromptTemplate(@PathVariable Long id) {
         promptTemplateService.deletePromptTemplate(id);
         return ResponseEntity.noContent().build();
     }
