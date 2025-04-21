@@ -2,14 +2,14 @@ package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Entity(name = "OBJECTIVES")
 public class Objective implements Serializable {
@@ -30,26 +30,27 @@ public class Objective implements Serializable {
     @Column(nullable = false)
     private boolean isFirstTimeExercising;
     @Column(nullable = false)
-    private Set<DayOfWeek> availableTrainingDays;
+    private List<String> availableTrainingDays;
     @OneToMany(mappedBy = "objective", cascade = CascadeType.ALL)
     private List<Training> trainings;
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
-
-    public Objective(Long id, String title, double targetDistance, Duration targetTime, LocalDate targetDate, boolean isFirstTimeExercising, Set<DayOfWeek> availableTrainingDays) {
-        this.id = id;
-        this.title = title;
-        this.targetDistance = targetDistance;
-        this.targetTime = targetTime;
-        this.targetDate = targetDate;
-        this.isFirstTimeExercising = isFirstTimeExercising;
-        this.availableTrainingDays = availableTrainingDays;
-    }
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     public Objective() {
 
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Long getId() {
@@ -100,11 +101,11 @@ public class Objective implements Serializable {
         isFirstTimeExercising = firstTimeExercising;
     }
 
-    public Set<DayOfWeek> getAvailableTrainingDays() {
+    public List<String> getAvailableTrainingDays() {
         return availableTrainingDays;
     }
 
-    public void setAvailableTrainingDays(Set<DayOfWeek> availableTrainingDays) {
+    public void setAvailableTrainingDays(List<String> availableTrainingDays) {
         this.availableTrainingDays = availableTrainingDays;
     }
 

@@ -14,20 +14,15 @@ public class PhysicalActivity implements Serializable {
     private Long id;
     private String name;
     private Frequency frequency;
-    private String observation;
-    @Column(nullable = false)
-    private boolean feltPain;
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
 
-    public PhysicalActivity(Long id, String name, Frequency frequency, String observation, boolean feltPain, User user) {
+    public PhysicalActivity(Long id, String name, Frequency frequency, User user) {
         this.id = id;
         this.name = name;
         this.frequency = frequency;
-        this.observation = observation;
-        this.feltPain = feltPain;
         this.user = user;
     }
 
@@ -57,22 +52,6 @@ public class PhysicalActivity implements Serializable {
 
     public void setFrequency(Frequency frequency) {
         this.frequency = frequency;
-    }
-
-    public String getObservation() {
-        return observation;
-    }
-
-    public void setObservation(String observation) {
-        this.observation = observation;
-    }
-
-    public boolean isFeltPain() {
-        return feltPain;
-    }
-
-    public void setFeltPain(boolean feltPain) {
-        this.feltPain = feltPain;
     }
 
     public User getUser() {

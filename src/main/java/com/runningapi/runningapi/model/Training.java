@@ -1,12 +1,12 @@
 package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.runningapi.runningapi.dto.TrainingDto;
 import com.runningapi.runningapi.enums.StatusActivity;
 import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 @Entity(name = "TRAININGS")
@@ -22,17 +22,17 @@ public class Training implements Serializable {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String description;
 
     @Column(nullable = false)
-    private String weeklyGoal;
+    private Integer weekNumber;
 
     @Column(nullable = false)
     private LocalDate date;
 
     @Column(nullable = false)
-    private DayOfWeek dayOfWeekName;
+    private String weekDay;
 
     @Column(nullable = false)
     private StatusActivity statusActivity = StatusActivity.PENDING;
@@ -45,14 +45,11 @@ public class Training implements Serializable {
     @JoinColumn(name = "objective_id")
     private Objective objective;
 
-    public Training(Long id, String title, String description, String weeklyGoal, LocalDate date, DayOfWeek dayOfWeekName, Objective objective) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.weeklyGoal = weeklyGoal;
-        this.date = date;
-        this.dayOfWeekName = dayOfWeekName;
-        this.objective = objective;
+    public Training(TrainingDto trainingDto) {
+        this.title = trainingDto.title();
+        this.description = trainingDto.description();
+        this.date = trainingDto.date();
+        this.weekDay = trainingDto.weekDay();
     }
 
     public Training() {
@@ -83,12 +80,20 @@ public class Training implements Serializable {
         this.description = description;
     }
 
-    public String getWeeklyGoal() {
-        return weeklyGoal;
+    public Integer getWeekNumber() {
+        return weekNumber;
     }
 
-    public void setWeeklyGoal(String weeklyGoal) {
-        this.weeklyGoal = weeklyGoal;
+    public void setWeekNumber(Integer weekNumber) {
+        this.weekNumber = weekNumber;
+    }
+
+    public String getWeekDay() {
+        return weekDay;
+    }
+
+    public void setWeekDay(String weekDay) {
+        this.weekDay = weekDay;
     }
 
     public LocalDate getDate() {
@@ -97,14 +102,6 @@ public class Training implements Serializable {
 
     public void setDate(LocalDate date) {
         this.date = date;
-    }
-
-    public DayOfWeek getDayOfWeekName() {
-        return dayOfWeekName;
-    }
-
-    public void setDayOfWeekName(DayOfWeek dayOfWeekName) {
-        this.dayOfWeekName = dayOfWeekName;
     }
 
     public Objective getObjective() {

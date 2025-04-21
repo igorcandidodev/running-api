@@ -9,18 +9,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class SwaggerConfiguration {
+public class SwaggerConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .components(new Components())
                 .info(new Info()
-                        .title("Running API")
+                        .title("Moove API")
                         .version("1.0.0")
                         .description("")
                         .contact(new Contact()
-                                .name("Run AI API - Support")
+                                .name("Moove API - Support")
                                 .email("running.ai.contato@gmail.com")
                                 .url("https://github.com/igorcandidodev/running-api"))
                         .license(new License()
