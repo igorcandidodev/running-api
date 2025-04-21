@@ -43,7 +43,7 @@ public class GoogleAuthService {
                 "&prompt=consent";
     }
 
-    public void processAuthorizationCode(String code) throws IOException {
+    public User processAuthorizationCode(String code) throws IOException {
         GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(
                 new NetHttpTransport(),
                 GsonFactory.getDefaultInstance(),
@@ -58,13 +58,23 @@ public class GoogleAuthService {
         GoogleIdToken.Payload payload = idToken.getPayload();
         String userEmail = payload.getEmail();
         Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        User user;
 
         if (optionalUser.isPresent()) {
             handleExistingUser(optionalUser.get(), tokenResponse);
+            optionalUser.get().setProvider("GOOGLE");
+
+            userRepository.save(optionalUser.get());
+
+            user = optionalUser.get();
         } else {
             User newUser = createUser(payload);
+            newUser.setProvider("GOOGLE");
             handleExistingUser(newUser, tokenResponse);
+            user = newUser;
         }
+
+        return user;
     }
 
     private void handleExistingUser(User user, GoogleTokenResponse tokenResponse) {
@@ -82,8 +92,7 @@ public class GoogleAuthService {
 
     private User createUser(GoogleIdToken.Payload payload) {
         User user = new User((String) payload.get("name"), payload.getEmail());
-        userRepository.save(user);
-        return user;
+        return userRepository.save(user);
     }
 
     public void refreshAccessToken(GoogleAuthentication googleAuth) throws IOException {
