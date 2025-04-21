@@ -61,6 +61,13 @@ public class User implements Serializable {
         this.physicalLimitation = physicalLimitation;
     }
 
+    public User(String fullName, LocalDate birthDate, String email, String password) {
+        this.fullName = fullName;
+        this.birthDate = birthDate;
+        this.email = email;
+        this.password = password;
+    }
+
     public User(String fullName, String email) {
         this.fullName = fullName;
         this.email = email;
