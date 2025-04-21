@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public class DataConverter {
+public class DateConverter {
 
     public static ZonedDateTime convertToZonedDateTime(Integer timestamp) {
         if (timestamp == null) {
