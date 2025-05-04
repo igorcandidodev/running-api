@@ -48,7 +48,7 @@ public record PromptVariablesDto(Objective objective,
         variables.put("bestRun2Distance", bestRuns.size() > 1 ? bestRuns.get(1).getDistanceCovered() : 0);
         variables.put("bestRun2Time", bestRuns.size() > 1 ? formatDuration(bestRuns.get(1).getTimeSpent()) : DEFAULT_TIME_FORMAT);
 
-        variables.put("sportName", physicalActivity.getName());
+        variables.put("sportName", physicalActivity.getSportActivity());
         variables.put("frequency", physicalActivity.getFrequency());
 
         variables.put("feltPain", physicalLimitation.isFeltPain() ? "Sim" : "Não");

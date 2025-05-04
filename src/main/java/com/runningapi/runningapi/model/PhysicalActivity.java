@@ -2,6 +2,7 @@ package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.runningapi.runningapi.enums.Frequency;
+import com.runningapi.runningapi.enums.SportActivity;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -12,16 +13,15 @@ public class PhysicalActivity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private SportActivity sportActivity;
     private Frequency frequency;
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
 
-    public PhysicalActivity(Long id, String name, Frequency frequency, User user) {
-        this.id = id;
-        this.name = name;
+    public PhysicalActivity(SportActivity sportActivity, Frequency frequency, User user) {
+        this.sportActivity = sportActivity;
         this.frequency = frequency;
         this.user = user;
     }
@@ -38,12 +38,12 @@ public class PhysicalActivity implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public SportActivity getSportActivity() {
+        return sportActivity;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSportActivity(SportActivity sportActivity) {
+        this.sportActivity = sportActivity;
     }
 
     public Frequency getFrequency() {
