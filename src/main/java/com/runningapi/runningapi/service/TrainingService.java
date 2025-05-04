@@ -71,7 +71,7 @@ public class TrainingService {
             throw new UserPromptNotFound();
         }
 
-        // TODO: Adjust assinature on OpenAi to use the chatGptService
+        // TODO: Pay assinature on OpenAi to use the chatGptService
 
         String response = chatGptService.sendPrompt(systemPrompt, updatedUserPrompt);
 
