@@ -1,9 +1,11 @@
 package com.runningapi.runningapi.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum Frequency {
-    ALWAYS("Sempre"),
-    SOMETIMES("Às vezes"),
-    RARELY("Raramente");
+    ALWAYS("SEMPRE"),
+    SOMETIMES("ÀS VEZES"),
+    RARELY("RARAMENTE");
 
     private final String value;
 
@@ -18,5 +20,15 @@ public enum Frequency {
     @Override
     public String toString() {
         return value;
+    }
+
+    @JsonCreator
+    public static Frequency fromValue(String value) {
+        for (Frequency frequency : Frequency.values()) {
+            if (frequency.value.equalsIgnoreCase(value)) {
+                return frequency;
+            }
+        }
+        throw new IllegalArgumentException("Valor inválido para Frequency: " + value);
     }
 }

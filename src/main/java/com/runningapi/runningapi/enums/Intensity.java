@@ -1,9 +1,11 @@
 package com.runningapi.runningapi.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum Intensity {
-    FRACO("Fraco"),
-    MODERADO("Moderado"),
-    FORTE("Forte");
+    WEAK("FRACO"),
+    MEDIUM("MODERADO"),
+    STRONG("FORTE");
 
     private final String value;
 
@@ -18,5 +20,15 @@ public enum Intensity {
     @Override
     public String toString() {
         return value;
+    }
+
+    @JsonCreator
+    public static Intensity fromValue(String value) {
+        for (Intensity intensity : Intensity.values()) {
+            if (intensity.value.equalsIgnoreCase(value)) {
+                return intensity;
+            }
+        }
+        throw new IllegalArgumentException("Valor inválido para Intensity: " + value);
     }
 }

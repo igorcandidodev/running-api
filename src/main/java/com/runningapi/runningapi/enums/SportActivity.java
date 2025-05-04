@@ -1,13 +1,15 @@
 package com.runningapi.runningapi.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum SportActivity {
-    CORRIDA("Corrida"),
-    MUSCULACAO("Musculação"),
-    NATACAO("Natação"),
-    LUTA("Luta"),
-    FUTEBOL("Futebol"),
-    CICLISMO("Ciclismo"),
-    OUTRO("Outro");
+    RUNNING("CORRIDA"),
+    GYMGOER("MUSCULAÇÃO"),
+    SWIMMING("NATAÇÃO"),
+    FIGHTING("LUTA"),
+    SOCCER("FUTEBOL"),
+    CYCLING("CICLISMO"),
+    OTHER("OUTRO");
 
     private final String value;
 
@@ -22,5 +24,15 @@ public enum SportActivity {
     @Override
     public String toString() {
         return value;
+    }
+
+    @JsonCreator
+    public static SportActivity fromValue(String value) {
+        for (SportActivity activity : SportActivity.values()) {
+            if (activity.value.equalsIgnoreCase(value)) {
+                return activity;
+            }
+        }
+        throw new IllegalArgumentException("Valor inválido para SportActivity: " + value);
     }
 }

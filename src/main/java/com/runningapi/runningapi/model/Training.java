@@ -34,7 +34,8 @@ public class Training implements Serializable {
     @Column(nullable = false)
     private String weekDay;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 15)
+    @Enumerated(EnumType.STRING)
     private StatusActivity statusActivity = StatusActivity.PENDING;
 
     @OneToOne(mappedBy = "training", cascade = CascadeType.ALL)

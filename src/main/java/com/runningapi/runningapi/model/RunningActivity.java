@@ -22,7 +22,8 @@ public class RunningActivity implements Serializable {
     @Column(nullable = false)
     private Duration timeSpent;
     private LocalDate date;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 15)
+    @Enumerated(EnumType.STRING)
     private Intensity intensity;
     @Column(nullable = false)
     private boolean feltTired;

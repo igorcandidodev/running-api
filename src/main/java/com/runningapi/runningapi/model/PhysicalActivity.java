@@ -13,7 +13,11 @@ public class PhysicalActivity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 15)
     private SportActivity sportActivity;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 15)
     private Frequency frequency;
     @ManyToOne
     @JsonIgnore
