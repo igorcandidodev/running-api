@@ -1,9 +1,11 @@
 package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.runningapi.runningapi.dto.PhysicalActivityDto;
 import com.runningapi.runningapi.enums.Frequency;
 import com.runningapi.runningapi.enums.SportActivity;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 
 import java.io.Serializable;
 
@@ -24,14 +26,14 @@ public class PhysicalActivity implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public PhysicalActivity(SportActivity sportActivity, Frequency frequency, User user) {
-        this.sportActivity = sportActivity;
-        this.frequency = frequency;
-        this.user = user;
-    }
-
     public PhysicalActivity() {
 
+    }
+
+    public PhysicalActivity(@Valid PhysicalActivityDto physicalActivityDto, User user) {
+        this.sportActivity = physicalActivityDto.sportActivity();
+        this.frequency = physicalActivityDto.frequency();
+        this.user = user;
     }
 
     public Long getId() {
