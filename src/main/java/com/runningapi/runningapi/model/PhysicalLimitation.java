@@ -1,6 +1,7 @@
 package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.runningapi.runningapi.dto.PhysicalLimitationDto;
 import jakarta.persistence.*;
 
 import java.io.Serial;
@@ -25,6 +26,12 @@ public class PhysicalLimitation implements Serializable {
     public PhysicalLimitation(boolean feltPain, String description, User user) {
         this.feltPain = feltPain;
         this.description = description;
+        this.user = user;
+    }
+
+    public PhysicalLimitation(PhysicalLimitationDto physicalLimitationDto, User user) {
+        this.feltPain = physicalLimitationDto.feltPain();
+        this.description = physicalLimitationDto.description();
         this.user = user;
     }
 
