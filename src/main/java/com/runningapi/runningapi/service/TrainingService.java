@@ -7,13 +7,17 @@ import com.runningapi.runningapi.dto.strava.response.activity.StravaActivityResp
 import com.runningapi.runningapi.enums.StatusActivity;
 import com.runningapi.runningapi.exceptions.ChatGptResponseNotFound;
 import com.runningapi.runningapi.exceptions.ChatGptResponseProcessingException;
+import com.runningapi.runningapi.exceptions.UserNotFound;
 import com.runningapi.runningapi.exceptions.UserPromptNotFound;
 import com.runningapi.runningapi.model.*;
 import com.runningapi.runningapi.repository.*;
 import com.runningapi.runningapi.utils.DateConverter;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +32,7 @@ public class TrainingService {
     private final PhysicalLimitationRepository physicalLimitationRepository;
     private final RunningActivityRepository runningActivityRepository;
     private final ObjectMapper objectMapper;
+    private final UserRepository userRepository;
 
     public TrainingService(TrainingRepository trainingRepository,
                            TrainingPerformedRepository trainingPerformedRepository,
@@ -37,7 +42,7 @@ public class TrainingService {
                            PhysicalActivityRepository physicalActivityRepository,
                            PhysicalLimitationRepository physicalLimitationRepository,
                            RunningActivityRepository runningActivityRepository,
-                           ObjectMapper objectMapper) {
+                           ObjectMapper objectMapper, UserRepository userRepository) {
         this.trainingRepository = trainingRepository;
         this.trainingPerformedRepository = trainingPerformedRepository;
         this.chatGptService = chatGptService;
@@ -47,39 +52,47 @@ public class TrainingService {
         this.physicalLimitationRepository = physicalLimitationRepository;
         this.runningActivityRepository = runningActivityRepository;
         this.objectMapper = objectMapper;
+        this.userRepository = userRepository;
     }
 
-    public List<Training> createTrainings(Long promptId, Long userId) {
-        Objective objective = objectiveRepository.findLatestByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Objective not found"));
-        PhysicalActivity physicalActivity = physicalActivityRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Physical Activity not found"));
-        PhysicalLimitation physicalLimitation = physicalLimitationRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Physical Limitation not found"));
+    public List<Training> createTrainings(Long promptId) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> optionalUser = userRepository.findByEmail(userDetails.getUsername());
+        if (optionalUser.isPresent()) {
+            var user = optionalUser.get();
 
-        PromptVariablesDto promptVariablesDto = new PromptVariablesDto(
-                objective,
-                physicalActivity,
-                physicalLimitation,
-                runningActivityRepository,
-                userId
-        );
+            Objective objective = objectiveRepository.findLatestByUserId(user.getId())
+                    .orElseThrow(() -> new RuntimeException("Objective not found"));
+            PhysicalActivity physicalActivity = physicalActivityRepository.findByUserId(user.getId())
+                    .orElseThrow(() -> new RuntimeException("Physical Activity not found"));
+            PhysicalLimitation physicalLimitation = physicalLimitationRepository.findByUserId(user.getId())
+                    .orElseThrow(() -> new RuntimeException("Physical Limitation not found"));
 
-        String systemPrompt = promptTemplateService.getSystemPrompt(promptId);
-        String updatedUserPrompt = promptTemplateService.getUpdatedUserPrompt(promptId, promptVariablesDto);
-        if (updatedUserPrompt == null || updatedUserPrompt.isEmpty()) {
-            throw new UserPromptNotFound();
+            PromptVariablesDto promptVariablesDto = new PromptVariablesDto(
+                    objective,
+                    physicalActivity,
+                    physicalLimitation,
+                    runningActivityRepository,
+                    user
+            );
+
+            String systemPrompt = promptTemplateService.getSystemPrompt(promptId);
+            String updatedUserPrompt = promptTemplateService.getUpdatedUserPrompt(promptId, promptVariablesDto);
+            if (updatedUserPrompt == null || updatedUserPrompt.isEmpty()) {
+                throw new UserPromptNotFound();
+            }
+
+            // TODO: Pay assinature on OpenAi to use the chatGptService
+
+            String response = chatGptService.sendPrompt(systemPrompt, updatedUserPrompt);
+
+            if (response == null || response.isEmpty()) {
+                throw new ChatGptResponseNotFound();
+            }
+            return processChatGptResponse(response, objective);
+        } else {
+            throw new UserNotFound(userDetails.getUsername());
         }
-
-        // TODO: Pay assinature on OpenAi to use the chatGptService
-
-        String response = chatGptService.sendPrompt(systemPrompt, updatedUserPrompt);
-
-        if (response == null || response.isEmpty()) {
-            throw new ChatGptResponseNotFound();
-        }
-
-        return processChatGptResponse(response, objective);
     }
 
     private List<Training> processChatGptResponse(String response, Objective objective) {

@@ -28,14 +28,10 @@ public class TrainingController {
     @Operation(summary = "Create trainings with ChatGPT")
     public ResponseEntity<List<Training>> createTrainingsWithChatGpt(@RequestParam(defaultValue = "1") Long promptId, UriComponentsBuilder uriBuilder) {
         try {
-            // TODO: Get userId from JWT token
-
-            List<Training> trainings = trainingService.createTrainings(promptId, 1L);
-
+            List<Training> trainings = trainingService.createTrainings(promptId);
             if (trainings.isEmpty()) {
                 return ResponseEntity.badRequest().body(null);
             }
-
             var location = uriBuilder.path("/training").build().toUri();
             return ResponseEntity.created(location).body(trainings);
         } catch (Exception e) {
