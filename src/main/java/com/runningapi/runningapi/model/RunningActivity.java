@@ -1,7 +1,9 @@
 package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.runningapi.runningapi.dto.RunningActivityDto;
 import com.runningapi.runningapi.enums.Intensity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 import java.io.Serial;
@@ -19,7 +21,8 @@ public class RunningActivity implements Serializable {
     private Long id;
     @Column(nullable = false)
     private double distanceCovered;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "BIGINT")
+    @Schema(type = "string", example = "00:10:00")
     private Duration timeSpent;
     private LocalDate date;
     @Column(nullable = false, length = 15)
@@ -46,6 +49,16 @@ public class RunningActivity implements Serializable {
 
     public RunningActivity() {
 
+    }
+
+    public RunningActivity(RunningActivityDto runningActivityDto, User user) {
+        this.distanceCovered = runningActivityDto.distanceCovered();
+        this.timeSpent = runningActivityDto.timeSpent();
+        this.date = runningActivityDto.date();
+        this.intensity = runningActivityDto.intensity();
+        this.feltTired = runningActivityDto.feltTired();
+        this.isBestResult = runningActivityDto.isBestResult();
+        this.user = user;
     }
 
     public Long getId() {
