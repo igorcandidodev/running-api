@@ -1,8 +1,11 @@
 package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.runningapi.runningapi.dto.PhysicalActivityDto;
 import com.runningapi.runningapi.enums.Frequency;
+import com.runningapi.runningapi.enums.SportActivity;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 
 import java.io.Serializable;
 
@@ -12,22 +15,25 @@ public class PhysicalActivity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 15)
+    private SportActivity sportActivity;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 15)
     private Frequency frequency;
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
 
-    public PhysicalActivity(Long id, String name, Frequency frequency, User user) {
-        this.id = id;
-        this.name = name;
-        this.frequency = frequency;
-        this.user = user;
-    }
-
     public PhysicalActivity() {
 
+    }
+
+    public PhysicalActivity(@Valid PhysicalActivityDto physicalActivityDto, User user) {
+        this.sportActivity = physicalActivityDto.sportActivity();
+        this.frequency = physicalActivityDto.frequency();
+        this.user = user;
     }
 
     public Long getId() {
@@ -38,12 +44,12 @@ public class PhysicalActivity implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public SportActivity getSportActivity() {
+        return sportActivity;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSportActivity(SportActivity sportActivity) {
+        this.sportActivity = sportActivity;
     }
 
     public Frequency getFrequency() {

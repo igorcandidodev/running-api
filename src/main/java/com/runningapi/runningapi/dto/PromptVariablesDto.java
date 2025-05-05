@@ -1,9 +1,6 @@
 package com.runningapi.runningapi.dto;
 
-import com.runningapi.runningapi.model.Objective;
-import com.runningapi.runningapi.model.PhysicalActivity;
-import com.runningapi.runningapi.model.PhysicalLimitation;
-import com.runningapi.runningapi.model.RunningActivity;
+import com.runningapi.runningapi.model.*;
 import com.runningapi.runningapi.repository.RunningActivityRepository;
 
 import java.time.Duration;
@@ -16,7 +13,7 @@ public record PromptVariablesDto(Objective objective,
                                  PhysicalActivity physicalActivity,
                                  PhysicalLimitation physicalLimitation,
                                  RunningActivityRepository runningActivityRepository,
-                                 Long userId) {
+                                 User user) {
 
     private String formatDuration(Duration duration) {
         long hours = duration.toHours();
@@ -30,8 +27,8 @@ public record PromptVariablesDto(Objective objective,
         Map<String, Object> variables = new HashMap<>();
 
         var currentDate = LocalDate.now();
-        List<RunningActivity> lastRuns = runningActivityRepository.findTop2ByUserIdOrderByDateDesc(userId);
-        List<RunningActivity> bestRuns = runningActivityRepository.findTop2ByUserIdAndIsBestResultTrueOrderByDateDesc(userId);
+        List<RunningActivity> lastRuns = runningActivityRepository.findTop2ByUserIdOrderByDateDesc(user.getId());
+        List<RunningActivity> bestRuns = runningActivityRepository.findTop2ByUserIdAndIsBestResultTrueOrderByDateDesc(user.getId());
 
         variables.put("targetDistance", objective.getTargetDistance());
         variables.put("targetDate", objective.getTargetDate());
@@ -48,7 +45,7 @@ public record PromptVariablesDto(Objective objective,
         variables.put("bestRun2Distance", bestRuns.size() > 1 ? bestRuns.get(1).getDistanceCovered() : 0);
         variables.put("bestRun2Time", bestRuns.size() > 1 ? formatDuration(bestRuns.get(1).getTimeSpent()) : DEFAULT_TIME_FORMAT);
 
-        variables.put("sportName", physicalActivity.getName());
+        variables.put("sportName", physicalActivity.getSportActivity());
         variables.put("frequency", physicalActivity.getFrequency());
 
         variables.put("feltPain", physicalLimitation.isFeltPain() ? "Sim" : "Não");

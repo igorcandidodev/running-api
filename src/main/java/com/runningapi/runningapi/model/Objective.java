@@ -1,6 +1,7 @@
 package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.runningapi.runningapi.dto.ObjectiveDto;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -23,7 +24,7 @@ public class Objective implements Serializable {
     private String title;
     @Column(nullable = false)
     private double targetDistance;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "BIGINT")
     private Duration targetTime;
     @Column(nullable = false)
     private LocalDate targetDate;
@@ -43,6 +44,16 @@ public class Objective implements Serializable {
 
     public Objective() {
 
+    }
+
+    public Objective(ObjectiveDto objectiveDto, User user) {
+        this.title = objectiveDto.title();
+        this.targetDistance = objectiveDto.targetDistance();
+        this.targetTime = objectiveDto.targetTime();
+        this.targetDate = objectiveDto.targetDate();
+        this.isFirstTimeExercising = objectiveDto.isFirstTimeExercising();
+        this.availableTrainingDays = objectiveDto.availableTrainingDays();
+        this.user = user;
     }
 
     public LocalDateTime getCreatedAt() {
