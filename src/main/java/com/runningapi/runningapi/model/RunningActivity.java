@@ -3,7 +3,6 @@ package com.runningapi.runningapi.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.runningapi.runningapi.dto.RunningActivityDto;
 import com.runningapi.runningapi.enums.Intensity;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 import java.io.Serial;
