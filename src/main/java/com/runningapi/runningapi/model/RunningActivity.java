@@ -22,7 +22,6 @@ public class RunningActivity implements Serializable {
     @Column(nullable = false)
     private double distanceCovered;
     @Column(nullable = false, columnDefinition = "BIGINT")
-    @Schema(type = "string", example = "00:10:00")
     private Duration timeSpent;
     private LocalDate date;
     @Column(nullable = false, length = 15)

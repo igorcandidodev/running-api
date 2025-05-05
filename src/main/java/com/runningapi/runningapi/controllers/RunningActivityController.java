@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@RequestMapping("/running-activity")
+@RequestMapping("/running-activities")
 public class RunningActivityController {
 
     private final RunningActivityService runningActivityService;
