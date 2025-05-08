@@ -60,4 +60,29 @@ public class EmailService {
             logger.error("Erro ao enviar email de boas vindas: e-mail: {}", user.getEmail(), e);
         }
     }
+
+    public void sendEmailForgetPassword(String code, String name, String email) {
+        try {
+            final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            final MimeMessageHelper emailHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            emailHelper.setTo(email);
+            emailHelper.setFrom(new InternetAddress(from, fromName));
+            emailHelper.setSubject("Recuperação de Senha");
+
+            final Context ctx = new Context(LocaleContextHolder.getLocale());
+
+            ctx.setVariable("name", name);
+            ctx.setVariable("code", code);
+
+            final String htmlContent = templateEngine.process("email-forget-password", ctx);
+
+            emailHelper.setText(htmlContent, true);
+
+            javaMailSender.send(mimeMessage);
+
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            logger.error("Erro ao enviar email de recuperação de senha: e-mail: {}", email, e);
+        }
+    }
 }

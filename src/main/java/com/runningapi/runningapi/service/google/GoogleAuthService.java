@@ -8,8 +8,11 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.runningapi.runningapi.model.google.GoogleAuthentication;
 import com.runningapi.runningapi.model.User;
+import com.runningapi.runningapi.queue.producer.QueueSender;
+import com.runningapi.runningapi.queue.services.EmailQueueService;
 import com.runningapi.runningapi.repository.GoogleAuthenticationRepository;
 import com.runningapi.runningapi.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +30,9 @@ public class GoogleAuthService {
     private String clientSecret;
     @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
     private String redirectUri;
+
+    @Autowired
+    private EmailQueueService emailQueueService;
 
     public GoogleAuthService(GoogleAuthenticationRepository googleAuthRepository, UserRepository userRepository) {
         this.googleAuthRepository = googleAuthRepository;
@@ -72,6 +78,8 @@ public class GoogleAuthService {
             newUser.setProvider("GOOGLE");
             handleExistingUser(newUser, tokenResponse);
             user = newUser;
+
+            emailQueueService.sendEmailUserRegistration(user);
         }
 
         return user;
