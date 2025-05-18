@@ -1,7 +1,7 @@
 package com.runningapi.runningapi.dto;
 
-import com.runningapi.runningapi.enums.Frequency;
-import com.runningapi.runningapi.enums.SportActivity;
+import com.runningapi.runningapi.model.enums.Frequency;
+import com.runningapi.runningapi.model.enums.SportActivity;
 import jakarta.validation.constraints.NotNull;
 
 public record PhysicalActivityDto(

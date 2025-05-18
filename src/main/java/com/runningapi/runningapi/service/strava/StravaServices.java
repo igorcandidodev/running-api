@@ -4,7 +4,7 @@ import com.runningapi.runningapi.configuration.StravaConfig;
 import com.runningapi.runningapi.dto.strava.request.WebhookEvent;
 import com.runningapi.runningapi.dto.strava.response.UserAuthenticationResponse;
 import com.runningapi.runningapi.dto.strava.response.activity.StravaActivityResponse;
-import com.runningapi.runningapi.enums.StatusActivity;
+import com.runningapi.runningapi.model.enums.StatusActivity;
 import com.runningapi.runningapi.exceptions.StravaAthleteNotFoundAsyncException;
 import com.runningapi.runningapi.exceptions.StravaAuthenticationAsyncException;
 import com.runningapi.runningapi.mapper.StravaAuthenticationMapper;

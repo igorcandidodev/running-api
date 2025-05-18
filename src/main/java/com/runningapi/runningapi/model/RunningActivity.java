@@ -2,7 +2,7 @@ package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.runningapi.runningapi.dto.RunningActivityDto;
-import com.runningapi.runningapi.enums.Intensity;
+import com.runningapi.runningapi.model.enums.Intensity;
 import jakarta.persistence.*;
 
 import java.io.Serial;

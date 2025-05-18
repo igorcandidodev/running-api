@@ -1,5 +1,8 @@
 package com.runningapi.runningapi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.runningapi.runningapi.model.strava.MapStrava;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -38,11 +41,12 @@ public class TrainingPerformed implements Serializable {
 
     @OneToOne
     @JoinColumn(name = "training_id")
+    @JsonBackReference
     private Training training;
 
-    @ManyToOne
-    @JoinColumn(name = "objective_id", nullable = false)
-    private Objective objective;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "map_id")
+    private MapStrava mapStrava;
 
     public TrainingPerformed() {
 
@@ -88,13 +92,13 @@ public class TrainingPerformed implements Serializable {
         this.training = training;
     }
 
-    public Objective getObjective() {
-        return objective;
-    }
-
-    public void setObjective(Objective objective) {
-        this.objective = objective;
-    }
+//    public Objective getObjective() {
+//        return objective;
+//    }
+//
+//    public void setObjective(Objective objective) {
+//        this.objective = objective;
+//    }
 
     public Double getDistance() {
         return distance;
@@ -150,5 +154,13 @@ public class TrainingPerformed implements Serializable {
 
     public void setIdStrava(Long idStrava) {
         this.idStrava = idStrava;
+    }
+
+    public MapStrava getMapStrava() {
+        return mapStrava;
+    }
+
+    public void setMapStrava(MapStrava mapStrava) {
+        this.mapStrava = mapStrava;
     }
 }

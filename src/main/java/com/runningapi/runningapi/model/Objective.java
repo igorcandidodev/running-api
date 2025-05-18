@@ -2,6 +2,7 @@ package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.runningapi.runningapi.dto.ObjectiveDto;
+import com.runningapi.runningapi.model.enums.StatusObjective;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -17,30 +18,44 @@ public class Objective implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false, unique = true)
     private String title;
+
     @Column(nullable = false)
     private double targetDistance;
+
     @Column(nullable = false, columnDefinition = "BIGINT")
     private Duration targetTime;
+
     @Column(nullable = false)
     private LocalDate targetDate;
+
     @Column(nullable = false)
     private boolean isFirstTimeExercising;
+
     @Column(nullable = false)
     private List<String> availableTrainingDays;
+
+    @Enumerated(EnumType.STRING)
+    private StatusObjective status;
+
     @OneToMany(mappedBy = "objective", cascade = CascadeType.ALL)
     private List<Training> trainings;
+
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
 
     public Objective() {
 
@@ -54,6 +69,7 @@ public class Objective implements Serializable {
         this.isFirstTimeExercising = objectiveDto.isFirstTimeExercising();
         this.availableTrainingDays = objectiveDto.availableTrainingDays();
         this.user = user;
+        this.status = StatusObjective.ACTIVE;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -134,5 +150,13 @@ public class Objective implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public StatusObjective getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusObjective status) {
+        this.status = status;
     }
 }
