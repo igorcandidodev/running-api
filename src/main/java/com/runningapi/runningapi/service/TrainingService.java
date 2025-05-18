@@ -4,18 +4,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.runningapi.runningapi.dto.PromptVariablesDto;
 import com.runningapi.runningapi.dto.openai.ChatGptResponseDto;
 import com.runningapi.runningapi.dto.strava.response.activity.StravaActivityResponse;
-import com.runningapi.runningapi.enums.StatusActivity;
+import com.runningapi.runningapi.model.enums.StatusActivity;
 import com.runningapi.runningapi.exceptions.ChatGptResponseNotFound;
 import com.runningapi.runningapi.exceptions.ChatGptResponseProcessingException;
 import com.runningapi.runningapi.exceptions.UserNotFound;
 import com.runningapi.runningapi.exceptions.UserPromptNotFound;
 import com.runningapi.runningapi.model.*;
+import com.runningapi.runningapi.model.strava.MapStrava;
 import com.runningapi.runningapi.repository.*;
 import com.runningapi.runningapi.utils.DateConverter;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,6 +36,7 @@ public class TrainingService {
     private final RunningActivityRepository runningActivityRepository;
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
+    private final MapStravaRepository mapStravaRepository;
 
     public TrainingService(TrainingRepository trainingRepository,
                            TrainingPerformedRepository trainingPerformedRepository,
@@ -42,7 +46,7 @@ public class TrainingService {
                            PhysicalActivityRepository physicalActivityRepository,
                            PhysicalLimitationRepository physicalLimitationRepository,
                            RunningActivityRepository runningActivityRepository,
-                           ObjectMapper objectMapper, UserRepository userRepository) {
+                           ObjectMapper objectMapper, UserRepository userRepository, MapStravaRepository mapStravaRepository) {
         this.trainingRepository = trainingRepository;
         this.trainingPerformedRepository = trainingPerformedRepository;
         this.chatGptService = chatGptService;
@@ -53,6 +57,7 @@ public class TrainingService {
         this.runningActivityRepository = runningActivityRepository;
         this.objectMapper = objectMapper;
         this.userRepository = userRepository;
+        this.mapStravaRepository = mapStravaRepository;
     }
 
     public List<Training> createTrainings(Long promptId) {
@@ -132,15 +137,14 @@ public class TrainingService {
                 idUser);
 
         if (trainingTarget != null) {
-            var trainingPerformed = new TrainingPerformed();
+            var trainingPerformed = getTrainingPerformed(training, trainingTarget);
+            var mapStrava = getMapStrava(training);
 
-            trainingPerformed.setTitle(trainingTarget.getTitle());
-            trainingPerformed.setDescription(trainingTarget.getDescription());
-            trainingPerformed.setDate(training.startDate());
-            trainingPerformed.setDistance(training.distance());
-            trainingPerformed.setTraining(trainingTarget);
-            trainingPerformed.setObjective(trainingTarget.getObjective());
-            trainingPerformed.setIdStrava(training.id());
+            if (mapStrava != null) {
+                mapStravaRepository.save(mapStrava);
+
+                trainingPerformed.setMapStrava(mapStrava);
+            }
 
             trainingPerformedRepository.save(trainingPerformed);
 
@@ -152,8 +156,50 @@ public class TrainingService {
         }
     }
 
+    private TrainingPerformed getTrainingPerformed(StravaActivityResponse training, Training trainingTarget) {
+        var trainingPerformed = new TrainingPerformed();
+
+        trainingPerformed.setTitle(trainingTarget.getTitle());
+        trainingPerformed.setDescription(trainingTarget.getDescription());
+        trainingPerformed.setDate(training.startDate());
+        trainingPerformed.setDistance(training.distance());
+        trainingPerformed.setTraining(trainingTarget);
+        trainingPerformed.setIdStrava(training.id());
+        return trainingPerformed;
+    }
+
+    private MapStrava getMapStrava(StravaActivityResponse training) {
+        if(training.map() == null) {
+            return null;
+        }
+        MapStrava mapStrava = new MapStrava();
+
+        mapStrava.setIdStrava(training.map().id());
+        mapStrava.setSummaryPolyline(training.map().summaryPolyline());
+        mapStrava.setResourceState(training.map().resourceState());
+        mapStrava.setPolyline(training.map().polyline());
+
+        return mapStrava;
+    }
+
     public Training findTrainingByStravaId(Long stravaId) {
         return trainingRepository.findByIdStrava(stravaId)
                 .orElseThrow(() -> new RuntimeException("Training performed not found"));
+    }
+
+    public List<Training> getAllTrainings() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return trainingRepository.findAllTrainingByUserEmail(userDetails.getUsername());
+    }
+
+    public List<Training> getAllTrainingsForPeriod(LocalDate startDate, LocalDate endDate) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return trainingRepository.findAllForPeriodByUserEmail(userDetails.getUsername(), startDate, (endDate != null ? endDate : LocalDate.now()));
+    }
+
+    public Training findTrainingById(Long id) {
+        return trainingRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Training not found", id));
     }
 }

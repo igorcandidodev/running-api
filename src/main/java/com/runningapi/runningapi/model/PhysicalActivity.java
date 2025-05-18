@@ -2,8 +2,8 @@ package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.runningapi.runningapi.dto.PhysicalActivityDto;
-import com.runningapi.runningapi.enums.Frequency;
-import com.runningapi.runningapi.enums.SportActivity;
+import com.runningapi.runningapi.model.enums.Frequency;
+import com.runningapi.runningapi.model.enums.SportActivity;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 

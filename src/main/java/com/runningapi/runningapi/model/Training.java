@@ -1,8 +1,9 @@
 package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.runningapi.runningapi.dto.TrainingDto;
-import com.runningapi.runningapi.enums.StatusActivity;
+import com.runningapi.runningapi.model.enums.StatusActivity;
 import jakarta.persistence.*;
 
 import java.io.Serial;
@@ -39,6 +40,7 @@ public class Training implements Serializable {
     private StatusActivity statusActivity = StatusActivity.PENDING;
 
     @OneToOne(mappedBy = "training", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private TrainingPerformed trainingPerformed;
 
     @ManyToOne

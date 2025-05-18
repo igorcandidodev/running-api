@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.runningapi.runningapi.utils.DurationDeserializer;
 import com.runningapi.runningapi.utils.DurationSerializer;
-import com.runningapi.runningapi.enums.Intensity;
+import com.runningapi.runningapi.model.enums.Intensity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 

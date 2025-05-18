@@ -4,6 +4,8 @@ import com.runningapi.runningapi.dto.ObjectiveDto;
 import com.runningapi.runningapi.exceptions.UserNotFound;
 import com.runningapi.runningapi.model.Objective;
 import com.runningapi.runningapi.model.User;
+import com.runningapi.runningapi.model.enums.StatusActivity;
+import com.runningapi.runningapi.model.enums.StatusObjective;
 import com.runningapi.runningapi.repository.ObjectiveRepository;
 import com.runningapi.runningapi.repository.UserRepository;
 import jakarta.validation.Valid;
@@ -11,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,5 +37,25 @@ public class ObjectiveService {
         } else {
             throw new UserNotFound(userDetails.getUsername());
         }
+    }
+
+    public List<Objective> findAllObjectives() {
+        var userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return objectiveRepository.findAllByUserEmail(userDetails.getUsername());
+    }
+
+    public void cancelObjective(Long id) {
+        var userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var objective = objectiveRepository.findById(id);
+
+        if (objective.isPresent() &&  objective.get().getUser().getEmail().equals(userDetails.getUsername())) {
+            objective.get().setStatus(StatusObjective.CANCELED);
+
+            objective.get().getTrainings().forEach(training -> training.setStatusActivity(StatusActivity.CANCELED));
+
+            objectiveRepository.save(objective.get());
+        }
+
     }
 }

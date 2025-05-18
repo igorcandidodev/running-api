@@ -2,6 +2,7 @@ package com.runningapi.runningapi.configuration;
 
 import com.runningapi.runningapi.model.User;
 import com.runningapi.runningapi.repository.UserRepository;
+import com.runningapi.runningapi.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,9 @@ public class TestConfig implements CommandLineRunner {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public void run(String... args) throws Exception {

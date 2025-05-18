@@ -1,4 +1,4 @@
-package com.runningapi.runningapi.enums;
+package com.runningapi.runningapi.model.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
