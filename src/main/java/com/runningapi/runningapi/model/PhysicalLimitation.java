@@ -35,6 +35,11 @@ public class PhysicalLimitation implements Serializable {
         this.user = user;
     }
 
+    public PhysicalLimitation(PhysicalLimitationDto physicalLimitationDto) {
+        this.feltPain = physicalLimitationDto.feltPain();
+        this.description = physicalLimitationDto.description();
+    }
+
     public PhysicalLimitation() {
 
     }

@@ -30,6 +30,11 @@ public class PhysicalActivity implements Serializable {
 
     }
 
+    public PhysicalActivity(@Valid PhysicalActivityDto physicalActivityDto) {
+        this.sportActivity = physicalActivityDto.sportActivity();
+        this.frequency = physicalActivityDto.frequency();
+    }
+
     public PhysicalActivity(@Valid PhysicalActivityDto physicalActivityDto, User user) {
         this.sportActivity = physicalActivityDto.sportActivity();
         this.frequency = physicalActivityDto.frequency();

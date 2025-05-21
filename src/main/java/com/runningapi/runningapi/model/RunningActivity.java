@@ -59,6 +59,15 @@ public class RunningActivity implements Serializable {
         this.user = user;
     }
 
+    public RunningActivity(RunningActivityDto runningActivityDto) {
+        this.distanceCovered = runningActivityDto.distanceCovered();
+        this.timeSpent = runningActivityDto.timeSpent();
+        this.date = runningActivityDto.date();
+        this.intensity = runningActivityDto.intensity();
+        this.feltTired = runningActivityDto.feltTired();
+        this.isBestResult = runningActivityDto.isBestResult();
+    }
+
     public Long getId() {
         return id;
     }
