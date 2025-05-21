@@ -72,6 +72,16 @@ public class Objective implements Serializable {
         this.status = StatusObjective.ACTIVE;
     }
 
+    public Objective(ObjectiveDto objectiveDto) {
+        this.title = objectiveDto.title();
+        this.targetDistance = objectiveDto.targetDistance();
+        this.targetTime = objectiveDto.targetTime();
+        this.targetDate = objectiveDto.targetDate();
+        this.isFirstTimeExercising = objectiveDto.isFirstTimeExercising();
+        this.availableTrainingDays = objectiveDto.availableTrainingDays();
+        this.status = StatusObjective.ACTIVE;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
