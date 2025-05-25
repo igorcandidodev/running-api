@@ -1,6 +1,7 @@
 package com.runningapi.runningapi.service;
 
 import com.runningapi.runningapi.dto.request.trainingperformed.TrainingPerformedRequestDto;
+import com.runningapi.runningapi.exceptions.TrainingPerformedException;
 import com.runningapi.runningapi.mapper.TrainingPerformedMapper;
 import com.runningapi.runningapi.model.TrainingPerformed;
 import com.runningapi.runningapi.model.enums.StatusActivity;
@@ -49,14 +50,14 @@ public class TrainingPerformedService {
                 return trainingPerformedRepository.save(trainingPerformed);
 
             } else {
-                throw new RuntimeException("Treino não pertence ao usuário autenticado.");
+                throw new TrainingPerformedException("Treino não pertence ao usuário autenticado.");
             }
         }
         catch (ObjectNotFoundException e) {
-            throw new RuntimeException("Treino informado não encontrado: " + e.getMessage());
+            throw new TrainingPerformedException("Treino informado não encontrado: " + e.getMessage());
         }
         catch (Exception e) {
-            throw new RuntimeException("Error creating training performed: " + e.getMessage());
+            throw new TrainingPerformedException("Error creating training performed: " + e.getMessage());
         }
     }
 }
