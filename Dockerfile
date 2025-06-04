@@ -5,6 +5,6 @@ RUN mvn clean package -X -DskipTests
 
 FROM openjdk:21-jdk
 WORKDIR /app
-COPY --from=build ./app/target/*.jar ./backend-saude360*.jar
+COPY --from=build ./app/target/*.jar ./runningapi*.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "runningapi*.jar"]
