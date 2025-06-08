@@ -6,6 +6,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import com.runningapi.runningapi.model.enums.Provider;
 import com.runningapi.runningapi.model.google.GoogleAuthentication;
 import com.runningapi.runningapi.model.User;
 import com.runningapi.runningapi.queue.producer.QueueSender;
@@ -68,14 +69,14 @@ public class GoogleAuthService {
 
         if (optionalUser.isPresent()) {
             handleExistingUser(optionalUser.get(), tokenResponse);
-            optionalUser.get().setProvider("GOOGLE");
+            optionalUser.get().setProvider(Provider.GOOGLE);
 
             userRepository.save(optionalUser.get());
 
             user = optionalUser.get();
         } else {
             User newUser = createUser(payload);
-            newUser.setProvider("GOOGLE");
+            newUser.setProvider(Provider.GOOGLE);
             handleExistingUser(newUser, tokenResponse);
             user = newUser;
 

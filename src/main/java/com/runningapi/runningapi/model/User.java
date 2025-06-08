@@ -1,6 +1,7 @@
 package com.runningapi.runningapi.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.runningapi.runningapi.model.enums.Provider;
 import com.runningapi.runningapi.model.strava.StravaAuthentication;
 import jakarta.persistence.*;
 
@@ -29,7 +30,8 @@ public class User implements Serializable {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    private String provider;
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<RunningActivity> runningHistory;
@@ -153,11 +155,11 @@ public class User implements Serializable {
         this.stravaAuthentication = stravaAuthentication;
     }
 
-    public String getProvider() {
+    public Provider getProvider() {
         return provider;
     }
 
-    public void setProvider(String provider) {
+    public void setProvider(Provider provider) {
         this.provider = provider;
     }
 }

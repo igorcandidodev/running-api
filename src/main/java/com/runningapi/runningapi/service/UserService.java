@@ -3,6 +3,7 @@ package com.runningapi.runningapi.service;
 import com.runningapi.runningapi.dto.request.user.UserRequestDto;
 import com.runningapi.runningapi.exceptions.UserException;
 import com.runningapi.runningapi.model.User;
+import com.runningapi.runningapi.model.enums.Provider;
 import com.runningapi.runningapi.repository.UserRepository;
 import com.runningapi.runningapi.utils.BCryptPasswordUtil;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class UserService {
         user.setFullName(userDto.name());
         user.setEmail(userDto.email());
         user.setPassword(BCryptPasswordUtil.hashPassword(userDto.password()));
-        user.setProvider("LOCAL");
+        user.setProvider(Provider.LOCAL);
 
         return userRepository.save(user);
     }
