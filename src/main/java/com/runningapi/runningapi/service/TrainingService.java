@@ -4,16 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.runningapi.runningapi.dto.PromptVariablesDto;
 import com.runningapi.runningapi.dto.openai.ChatGptResponseDto;
 import com.runningapi.runningapi.dto.strava.response.activity.StravaActivityResponse;
+import com.runningapi.runningapi.exceptions.*;
 import com.runningapi.runningapi.model.enums.StatusActivity;
-import com.runningapi.runningapi.exceptions.ChatGptResponseNotFound;
-import com.runningapi.runningapi.exceptions.ChatGptResponseProcessingException;
-import com.runningapi.runningapi.exceptions.UserNotFound;
-import com.runningapi.runningapi.exceptions.UserPromptNotFound;
 import com.runningapi.runningapi.model.*;
 import com.runningapi.runningapi.model.strava.MapStrava;
 import com.runningapi.runningapi.repository.*;
 import com.runningapi.runningapi.utils.DateConverter;
 import org.hibernate.ObjectNotFoundException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -124,7 +122,14 @@ public class TrainingService {
     }
 
     public Training findTrainingByDateAndUserId(String date, Long userId) {
-        return trainingRepository.findByDateAndUserId(date, userId).orElseThrow(() -> new RuntimeException("Training not found"));
+        PageRequest page = PageRequest.of(0, 1);
+        var trainings = trainingRepository.findByDateAndUserId(date, userId, page);
+
+        if (trainings.isEmpty()) {
+            throw new ActivityNotFoundException("Training not found for date: " + date + " and userId: " + userId);
+        }
+
+        return trainings.stream().findFirst().get();
     }
 
     public Training saveTraining(Training training) {

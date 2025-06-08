@@ -4,6 +4,7 @@ import com.runningapi.runningapi.configuration.StravaConfig;
 import com.runningapi.runningapi.dto.strava.request.WebhookEvent;
 import com.runningapi.runningapi.dto.strava.response.UserAuthenticationResponse;
 import com.runningapi.runningapi.dto.strava.response.activity.StravaActivityResponse;
+import com.runningapi.runningapi.exceptions.StravaInternalServerErrorAsyncException;
 import com.runningapi.runningapi.model.enums.StatusActivity;
 import com.runningapi.runningapi.exceptions.StravaAthleteNotFoundAsyncException;
 import com.runningapi.runningapi.exceptions.StravaAuthenticationAsyncException;
@@ -16,6 +17,7 @@ import com.runningapi.runningapi.service.TrainingPerformedService;
 import com.runningapi.runningapi.service.TrainingService;
 import com.runningapi.runningapi.utils.DateConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -187,21 +189,17 @@ public class StravaServices {
         }
 
         var tokenExpires = DateConverter.convertToZonedDateTime(stravaAuthentication.getExpiresAt());
-
-        int countRetry = 0;
-
-        while (tokenExpires.isBefore(ZonedDateTime.now()) && countRetry < 3) {
+        if (tokenExpires.isBefore(ZonedDateTime.now())) {
             stravaAuthentication = refreshAccessToken(stravaAuthentication);
             tokenExpires = DateConverter.convertToZonedDateTime(stravaAuthentication.getExpiresAt());
-            countRetry++;
         }
 
-        if (countRetry >= 3) {
-            throw new StravaAuthenticationAsyncException("User Authentication Strava not found don't being possible to get activity");
+        if (tokenExpires.isBefore(ZonedDateTime.now())) {
+            throw new StravaAuthenticationAsyncException("Strava access token expired, please re-authenticate.");
         }
 
         var url = new StringBuilder();
-        url.append(stravaConfig.getApiUri())
+        url.append(stravaConfig.getApiUri().endsWith("/") ? stravaConfig.getApiUri() : stravaConfig.getApiUri() + "/")
                 .append("activities/")
                 .append(event.objectId());
 
@@ -209,8 +207,10 @@ public class StravaServices {
                 .uri(url.toString())
                 .header("Authorization", "Bearer " + stravaAuthentication.getAccessToken())
                 .retrieve()
-                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                        clientResponse -> clientResponse.bodyToMono(String.class).map(body -> new StravaAuthenticationAsyncException("Exception while trying communicate with Strava API to get Activity" + body)))
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        clientResponse -> clientResponse.bodyToMono(String.class).map(body -> new StravaAuthenticationAsyncException("Exception Status Code 4XX while trying communicate with Strava API to get Activity" + body)))
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        clientResponse -> clientResponse.bodyToMono(String.class).map(body -> new StravaInternalServerErrorAsyncException("Exception Status Code 5XX while trying communicate with Strava API to get Activity" + body)))
                 .bodyToMono(StravaActivityResponse.class)
                 .block();
     }
