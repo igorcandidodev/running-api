@@ -1,12 +1,12 @@
 package com.runningapi.runningapi.dto.request.user;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
-public record UserRequestDto(
-        String name,
-
-        @Email
-        String email,
+public record UserResetPasswordDto(
+        @NotBlank
+        String code,
 
         @NotBlank
         @Size(min = 8, message = "Password must be at least 8 characters long")

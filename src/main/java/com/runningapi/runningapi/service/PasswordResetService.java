@@ -32,7 +32,7 @@ public class PasswordResetService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
-        if (!user.getProvider().equals(Provider.LOCAL.getProvider())) {
+        if (!user.getProvider().equals(Provider.LOCAL.getValue())) {
             throw new InvalidResetException("Reset de senha não permitido.");
         }
 
