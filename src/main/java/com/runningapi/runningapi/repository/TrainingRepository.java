@@ -1,6 +1,7 @@
 package com.runningapi.runningapi.repository;
 
 import com.runningapi.runningapi.model.Training;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,8 +18,9 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
             "WHERE (FUNCTION('TO_CHAR', t.date, 'DD/MM/YYYY') = ?1 " +
             "OR t.date = FUNCTION('DATE_SUB', CURRENT_DATE, 1))" +
             "AND t.objective.user.id = ?2 " +
+            "AND t.objective.status = 'ACTIVE'" +
             "ORDER BY t.date DESC")
-    Optional<Training> findByDateAndUserId(String date, Long userId);
+    List<Training> findByDateAndUserId(String date, Long userId, Pageable pageable);
 
     @Query("SELECT t FROM TRAININGS t " +
             "           JOIN t.trainingPerformed " +
