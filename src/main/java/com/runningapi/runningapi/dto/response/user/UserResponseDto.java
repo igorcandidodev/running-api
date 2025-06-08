@@ -1,5 +1,7 @@
 package com.runningapi.runningapi.dto.response.user;
 
+import com.runningapi.runningapi.model.enums.Provider;
+
 public record UserResponseDto(
         Long id,
 
@@ -7,6 +9,6 @@ public record UserResponseDto(
 
         String email,
 
-        String provider
+        Provider provider
 ) {
 }
