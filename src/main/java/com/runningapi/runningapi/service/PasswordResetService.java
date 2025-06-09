@@ -32,7 +32,7 @@ public class PasswordResetService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
-        if (!user.getProvider().equals(Provider.LOCAL.getValue())) {
+        if (!user.getProvider().equals(Provider.LOCAL)) {
             throw new InvalidResetException("Reset de senha não permitido.");
         }
 
@@ -67,7 +67,7 @@ public class PasswordResetService {
         passwordResetRepository.delete(passwordReset);
     }
 
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 */24 * * *")
     public void cleanExpiredResets() {
         passwordResetRepository.findAll().stream()
                 .filter(PasswordReset::isExpired)
