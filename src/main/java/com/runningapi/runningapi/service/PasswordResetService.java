@@ -67,7 +67,7 @@ public class PasswordResetService {
         passwordResetRepository.delete(passwordReset);
     }
 
-    @Scheduled(cron = "0 */24 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void cleanExpiredResets() {
         passwordResetRepository.findAll().stream()
                 .filter(PasswordReset::isExpired)
