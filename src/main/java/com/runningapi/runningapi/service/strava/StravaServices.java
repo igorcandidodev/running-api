@@ -13,11 +13,14 @@ import com.runningapi.runningapi.model.strava.StravaAuthentication;
 import com.runningapi.runningapi.repository.AthleteRepository;
 import com.runningapi.runningapi.repository.StravaAuthenticationRepository;
 import com.runningapi.runningapi.repository.UserRepository;
+import com.runningapi.runningapi.security.UserDetailsSecurity;
 import com.runningapi.runningapi.service.TrainingPerformedService;
 import com.runningapi.runningapi.service.TrainingService;
 import com.runningapi.runningapi.utils.DateConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -53,7 +56,9 @@ public class StravaServices {
         this.webClient = webClientBuilder.build();
     }
 
-    public String getRedirectUriAuthorization(Long id) {
+    public String getRedirectUriAuthorization() {
+        var userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         return  stravaConfig.getAuthUri() +
                 "authorize?" +
                 "client_id=" +
@@ -64,10 +69,10 @@ public class StravaServices {
                 "&approval_prompt=force" +
                 "&scope=" +
                 stravaConfig.getScope() +
-                "&state=" + id;
+                "&state=" + userDetails.getUsername();
     }
 
-    public void processAuthorizationCode(String code, Long state) {
+    public void processAuthorizationCode(String code, String state) {
         var url = new StringBuilder();
         url.append(stravaConfig.getAuthUri())
                 .append("token")
@@ -87,10 +92,10 @@ public class StravaServices {
                 .bodyToMono(UserAuthenticationResponse.class)
                 .block();
 
-        var stravaAuthentication = authenticationRepositoy.findByUserId(state);
+        var stravaAuthentication = authenticationRepositoy.findByUserEmail(state);
 
         if(stravaAuthentication == null) {
-            var user = userRepository.findById(state).orElseThrow(() -> new RuntimeException("User not found"));
+            var user = userRepository.findByEmail(state).orElseThrow(() -> new RuntimeException("User not found"));
             stravaAuthentication = stravaAuthenticationMapper.toEntity(response, user);
         } else {
             if(response != null) {

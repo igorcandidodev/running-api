@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StravaAuthenticationRepository extends JpaRepository<StravaAuthentication, Long> {
     StravaAuthentication findByUserId(Long userId);
+    StravaAuthentication findByUserEmail(String email);
 }
