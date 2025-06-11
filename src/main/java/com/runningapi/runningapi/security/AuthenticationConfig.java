@@ -42,8 +42,9 @@ public class AuthenticationConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/strava/**").permitAll()
+                        .requestMatchers("/api/v1/auth/google/**").permitAll()
+                        .requestMatchers("/api/v1/auth/local/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/auth/strava/callback").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/user/").permitAll()
                         .anyRequest()
                         .authenticated())
