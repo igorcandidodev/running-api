@@ -2,6 +2,9 @@ package com.runningapi.runningapi.dto.response.user;
 
 import com.runningapi.runningapi.model.enums.Provider;
 
+import java.time.LocalDate;
+import java.util.List;
+
 public record UserResponseDto(
         Long id,
 
@@ -9,6 +12,12 @@ public record UserResponseDto(
 
         String email,
 
-        Provider provider
+        Provider provider,
+
+        LocalDate birthDate,
+
+        List<PhysicalLimitationResponseDto> physicalLimitations,
+
+        List<PhysicalActivityResponseDto> physicalActivities
 ) {
 }
