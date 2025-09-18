@@ -1,43 +1,49 @@
-# Moove (Running) API
+# Running API
 
 API for managing running training plans, goals, and performed trainings, built with Spring Boot. It integrates Google OAuth2, Strava webhooks, AI-based plan generation, and asynchronous processing with RabbitMQ.
 
 ## 🚀 Key Features
 
 ### 🔐 Authentication & User Management
-- Local authentication: Email/password signup and login with JWT tokens.
-- Google OAuth2: Seamless login with Google accounts.
-- Strava integration: Connect Strava accounts for activity sync.
-- Password reset: Email-based recovery flow.
+
+* Local authentication: Email/password signup and login with JWT tokens.
+* Google OAuth2: Seamless login with Google accounts.
+* Strava integration: Connect Strava accounts for activity sync.
+* Password reset: Email-based recovery flow.
 
 ### 🏃‍♂️ Training Management
-- AI-powered training plans: Personalized plan generation using OpenAI (Spring AI).
-- Training tracking: Record and monitor performed trainings.
-- Objectives: Create and manage running goals.
-- Period queries: Retrieve data by date ranges.
+
+* AI-powered training plans: Personalized plan generation using OpenAI (Spring AI).
+* Training tracking: Record and monitor performed trainings.
+* Objectives: Create and manage running goals.
+* Period queries: Retrieve data by date ranges.
 
 ### 🤖 AI & Customization
-- Prompt templates: Manage customizable prompts for the AI.
-- Form-based generation: Consider fitness level, goals, and constraints.
-- Intelligent recommendations: AI adapts plans to user needs.
+
+* Prompt templates: Manage customizable prompts for the AI.
+* Form-based generation: Consider fitness level, goals, and constraints.
+* Intelligent recommendations: AI adapts plans to user needs.
 
 ### 🔗 External Integrations
-- Strava webhooks: Real-time activity synchronization.
-- Email notifications: Transactional emails via Gmail SMTP.
-- RabbitMQ messaging: Asynchronous event processing.
+
+* Strava webhooks: Real-time activity synchronization.
+* Email notifications: Transactional emails via Gmail SMTP.
+* RabbitMQ messaging: Asynchronous event processing.
 
 ## 🏗️ Architecture
 
 ### Tech Stack
-- Java 21 and Spring Boot 3.4.x.
-- Spring Security (JWT + OAuth2).
-- Spring Data JPA and PostgreSQL.
-- Spring AMQP and RabbitMQ.
-- Spring AI and OpenAI.
-- SpringDoc OpenAPI (Swagger).
-- Maven and Docker.
+
+* Java 21 and Spring Boot 3.4.x.
+* Spring Security (JWT + OAuth2).
+* Spring Data JPA and PostgreSQL.
+* Spring AMQP and RabbitMQ.
+* Spring AI and OpenAI.
+* SpringDoc OpenAPI (Swagger).
+* Maven and Docker.
 
 ### Project Structure
+
 ```
 src/main/java/com/runningapi/runningapi/
 ├── configuration/     # Swagger, Strava, and queue settings.
@@ -54,44 +60,51 @@ src/main/java/com/runningapi/runningapi/
 ## ⚙️ Configuration
 
 ### Prerequisites
-- Java 21+.
-- Maven 3.9+.
-- PostgreSQL 14+.
-- RabbitMQ 3.8+.
+
+* Java 21+.
+* Maven 3.9+.
+* PostgreSQL 14+.
+* RabbitMQ 3.8+.
 
 ### Environment Configuration
 
 Copy `application.sample.properties` to `application.properties` and set the values.
 
 #### Database
+
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5432/runningapi
-spring.datasource.username=postgres
-spring.datasource.password=postgres
+spring.datasource.username=postgres_user
+spring.datasource.password=postgres_password
 spring.jpa.hibernate.ddl-auto=update
 ```
 
 #### Security (JWT)
+
 ```properties
-spring.security.secret.token=your-secret-token
+# Use a strong, random secret (e.g., 32+ chars)
+spring.security.secret.token=change-this-to-a-strong-random-secret
 ```
 
 #### Google OAuth2
+
 ```properties
-spring.security.oauth2.client.registration.google.client-id=your-client-id
-spring.security.oauth2.client.registration.google.client-secret=your-client-secret
+spring.security.oauth2.client.registration.google.client-id=your-google-client-id
+spring.security.oauth2.client.registration.google.client-secret=your-google-client-secret
 spring.security.oauth2.client.registration.google.redirect-uri=http://localhost:8080/api/v1/auth/google/callback
 ```
 
 #### Strava
+
 ```properties
 strava.client.id=your-strava-client-id
 strava.client.secret=your-strava-client-secret
 strava.client.redirect_uri=http://localhost:8080/api/v1/auth/strava/callback
-strava.client.verify_token_callback=your-webhook-verify-token
+strava.client.verify_token_callback=your-strava-webhook-verify-token
 ```
 
 #### RabbitMQ
+
 ```properties
 spring.rabbitmq.host=localhost
 spring.rabbitmq.port=5672
@@ -100,6 +113,7 @@ spring.rabbitmq.password=guest
 ```
 
 #### Email (Gmail SMTP)
+
 ```properties
 spring.mail.host=xxxx.xxxxx.com
 spring.mail.port=xxx
@@ -108,8 +122,9 @@ spring.mail.password=your-app-password
 ```
 
 #### OpenAI
+
 ```properties
-spring.ai.openai.api-key=sk-your-openai-key
+spring.ai.openai.api-key=your-openai-key
 ```
 
 > Never commit secrets. Use environment variables or a secrets manager.
@@ -117,43 +132,42 @@ spring.ai.openai.api-key=sk-your-openai-key
 ## 🚀 Running the Application
 
 ### Locally with Maven
+
 ```bash
 1. Start the infrastructure:
 ```
 
-2. **Execute a aplicação:**
+2. **Run the application:**
+
 ```bash
 2. Run the application:
 ```
 
-A API estará disponível em: `http://localhost:8080`
-
 The API will be available at: `http://localhost:8080`.
 
 ### With Docker
+
 ```bash
 1. Build the image:
 ```
 
-2. **Execute o container:**
+2. **Run the container:**
+
 ```bash
 2. Run the container:
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/runningapi \
-  -e SPRING_DATASOURCE_USERNAME=postgres \
-  -e SPRING_DATASOURCE_PASSWORD=postgres \
-  -e SPRING_SECURITY_SECRET_TOKEN=change-me \
-  -e SPRING_AI_OPENAI_API_KEY=sk-*** \
+  -e SPRING_DATASOURCE_USERNAME=postgres_user \
+  -e SPRING_DATASOURCE_PASSWORD=postgres_password \
+  -e SPRING_SECURITY_SECRET_TOKEN=strong-random-secret \
+  -e SPRING_AI_OPENAI_API_KEY=your-openai-key \
   runningapi:local
 ```
 
-## 📚 Documentação da API
-
 ## 📚 API Documentation
-- **OpenAPI Spec**: http://localhost:8080/v3/api-docs
-- Swagger UI: http://localhost:8080/swagger-ui/index.html.
-- OpenAPI Spec: http://localhost:8080/v3/api-docs.
 
-Authentication: Bearer JWT (`Authorization: Bearer <token>`).
+* **OpenAPI Spec**: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+* Swagger UI: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html).
+* Authentication: Bearer JWT (`Authorization: Bearer <token>`).
 
 ## 🔐 Authentication Endpoints
 
