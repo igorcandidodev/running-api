@@ -101,8 +101,8 @@ spring.rabbitmq.password=guest
 
 #### Email (Gmail SMTP)
 ```properties
-spring.mail.host=smtp.gmail.com
-spring.mail.port=587
+spring.mail.host=xxxx.xxxxx.com
+spring.mail.port=xxx
 spring.mail.username=your-email@gmail.com
 spring.mail.password=your-app-password
 ```
